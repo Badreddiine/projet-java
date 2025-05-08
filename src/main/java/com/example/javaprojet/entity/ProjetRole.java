@@ -1,5 +1,6 @@
 package com.example.javaprojet.entity;
 
+import com.example.javaprojet.model.RoleSecondaire;
 import com.example.javaprojet.model.RoleType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -23,6 +24,11 @@ public class ProjetRole {
 
     @Enumerated(EnumType.STRING)
     private RoleType role;
+
+    public ProjetRole(Projet projet, Utilisateur demandeur, RoleSecondaire roleSecondaire) {
+        this.projet = projet;
+        this.utilisateur = demandeur;
+    }
 
 
     public Long getId() {
