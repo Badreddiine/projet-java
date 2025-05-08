@@ -1,4 +1,3 @@
-
 package com.example.javaprojet.entity;
 import java.util.*;
 import com.example.javaprojet.model.Role;
@@ -26,16 +25,19 @@ public class Utilisateur {
     @Column(unique = true, nullable = false)
     private String email;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private String motDePasse;
 
     @Lob
     private byte[] photoProfile;
 
+    // Pour intégrer avec UtilisateurDTO
+    private String avatar;
+
     private boolean actif;
 
-    // Ajout des champs manquants
     private boolean estConnecte;
+    private boolean estEnLigne; // Pour correspondre au DTO
 
     @Temporal(TemporalType.TIMESTAMP)
     private Date derniereConnexion;
@@ -45,6 +47,14 @@ public class Utilisateur {
 
     @Temporal(TemporalType.TIMESTAMP)
     private Date dateInscription;
+
+    // Ajout pour l'authentification OAuth2
+    private String providerId; // ID de l'utilisateur chez le fournisseur (Google)
+    private String provider; // Nom du fournisseur (google, local, etc.)
+
+    // Pour le refresh token (JWT)
+    @Column(length = 1000)
+    private String refreshToken;
 
     @ManyToMany(mappedBy = "membres")
     private Set<Groupe> groupes = new HashSet<>();
@@ -58,7 +68,7 @@ public class Utilisateur {
     @OneToMany(mappedBy = "expediteur")
     private List<Message> messagesEnvoyes = new ArrayList<>();
 
-    @OneToMany(mappedBy = "destinataire")  // Correction: Ajout du mapping correct
+    @OneToMany(mappedBy = "destinataire")
     private List<Message> messagesRecus = new ArrayList<>();
 
     @OneToOne(mappedBy = "utilisateur", cascade = CascadeType.ALL)
@@ -67,7 +77,12 @@ public class Utilisateur {
     @OneToMany(mappedBy = "proprietaire")
     private Set<Calendrier> calendriers = new HashSet<>();
 
-    // Pour simplifier l'affichage console
+    // Méthodes utilitaires pour le statut de connexion
+    public void setConnecte(boolean connecte) {
+        this.estConnecte = connecte;
+        this.estEnLigne = connecte;
+    }
+
     @Override
     public String toString() {
         return "Utilisateur{" +
@@ -81,6 +96,7 @@ public class Utilisateur {
                 ", estConnecte=" + estConnecte +
                 ", derniereConnexion=" + derniereConnexion +
                 ", dateInscription=" + dateInscription +
+                ", provider='" + provider + '\'' +
                 '}';
     }
 }

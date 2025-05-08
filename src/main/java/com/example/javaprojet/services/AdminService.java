@@ -26,8 +26,6 @@ public class AdminService {
     @Autowired
     UtilisateurRepesitory utilisateurRepesitory;
     @Autowired
-    ProjetUtilisateurEnAttenteRepository projetUtilisateurEnAttenteRepository;
-    @Autowired
     ProjetRoleRepository pjRoleRepository;
     @Autowired
     private RoleService roleService;
@@ -48,7 +46,6 @@ public class AdminService {
         }
 
         projet.setEtat("ACCEPTE");
-        projet.setDateAcceptation(new Date());
 
         Groupe groupe = projet.getGroupe();
         if (groupe == null) {
@@ -79,7 +76,7 @@ public class AdminService {
         }
 
         projet.setEtat("REJETE");
-        projet.setDateRejet(new Date());
+
         Groupe groupe = projet.getGroupe();
         if (groupe != null) {
             groupe.getProjets().remove(projet);
@@ -173,7 +170,6 @@ public class AdminService {
 
         projetRoleRepository.deleteByUtilisateurId(utilisateurId);
         groupeRepesitory.retirerUtilisateurDeTousLesGroupes(utilisateurId);
-        projetRepesitory.retirerUtilisateurDeTousLesProjets(utilisateurId);
         utilisateurRepesitory.delete(utilisateur);
     }
 

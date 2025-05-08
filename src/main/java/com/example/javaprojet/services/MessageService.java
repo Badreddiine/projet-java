@@ -63,17 +63,8 @@ public class MessageService {
     }
 
     @Transactional
-    public Message creerUserLeaveMessage(Utilisateur utilisateur, SalleDiscussion salle) {
-        Message message = Message.builder()
-                .idExpediteur(utilisateur.getId())
-                .expediteur(utilisateur)
-                .contenu(utilisateur.getNom() + " a quitté la salle")
-                .dateEnvoi(new Date())
-                .salle(salle)
-                .type(MessageType.LEAVE)
-                .estLu(false)
-                .build();
-        return messageRepository.save(message);
+    public Message creerUserLeaveMessage(Object utilisateur, SalleDiscussion salle) {
+        return null;
     }
 
     @Transactional
@@ -99,6 +90,9 @@ public class MessageService {
     @Transactional
     public void supprimerMessage(Long messageId) {
         messageRepository.deleteById(messageId);
+    }
+
+    public Message creerUserLeaveMessage(Object utilisateur, SalleDiscussion salle) {
     }
 }
 

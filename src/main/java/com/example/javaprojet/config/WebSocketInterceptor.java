@@ -1,6 +1,7 @@
 package com.example.javaprojet.config;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
@@ -8,7 +9,6 @@ import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
 import org.springframework.messaging.support.MessageHeaderAccessor;
 import org.springframework.stereotype.Component;
-import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 
 import java.security.Principal;
 
@@ -53,5 +53,7 @@ public class WebSocketInterceptor implements ChannelInterceptor {
 
         return message;
     }
+
+
 }
 

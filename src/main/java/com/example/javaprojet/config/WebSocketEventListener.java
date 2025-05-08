@@ -37,7 +37,7 @@ public class WebSocketEventListener {
             // Récupérer la salle concernée
             salleDiscussionService.getSalleById(salleId).ifPresent(salle -> {
                 // Trouver l'utilisateur par nom
-                utilisateurService.findByNom(username).ifPresent(utilisateur -> {
+                utilisateurService.findByNom(username).set(utilisateur -> {
                     // Créer un message de déconnexion
                     Message message = messageService.creerUserLeaveMessage(utilisateur, salle);
 
