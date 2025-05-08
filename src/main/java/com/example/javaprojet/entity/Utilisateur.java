@@ -1,11 +1,13 @@
+
 package com.example.javaprojet.entity;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
+import com.example.javaprojet.model.Role;
 import jakarta.persistence.*;
 import lombok.Data;
+
 @Entity
 @Data
+@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
 public class Utilisateur {
 
     @Id
@@ -32,6 +34,15 @@ public class Utilisateur {
 
     private boolean actif;
 
+    // Ajout des champs manquants
+    private boolean estConnecte;
+
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date derniereConnexion;
+
+    @Enumerated(EnumType.STRING)
+    private Role role;
+
     @Temporal(TemporalType.TIMESTAMP)
     private Date dateInscription;
 
@@ -45,7 +56,10 @@ public class Utilisateur {
     private Set<Projet> projetsAdministres = new HashSet<>();
 
     @OneToMany(mappedBy = "expediteur")
-    private Set<Message> messagesEnvoyes = new HashSet<>();
+    private List<Message> messagesEnvoyes = new ArrayList<>();
+
+    @OneToMany(mappedBy = "destinataire")  // Correction: Ajout du mapping correct
+    private List<Message> messagesRecus = new ArrayList<>();
 
     @OneToOne(mappedBy = "utilisateur", cascade = CascadeType.ALL)
     private Admin admin;
@@ -53,4 +67,20 @@ public class Utilisateur {
     @OneToMany(mappedBy = "proprietaire")
     private Set<Calendrier> calendriers = new HashSet<>();
 
+    // Pour simplifier l'affichage console
+    @Override
+    public String toString() {
+        return "Utilisateur{" +
+                "id=" + id +
+                ", identifiant='" + identifiant + '\'' +
+                ", nom='" + nom + '\'' +
+                ", prenom='" + prenom + '\'' +
+                ", email='" + email + '\'' +
+                ", role=" + role +
+                ", actif=" + actif +
+                ", estConnecte=" + estConnecte +
+                ", derniereConnexion=" + derniereConnexion +
+                ", dateInscription=" + dateInscription +
+                '}';
+    }
 }

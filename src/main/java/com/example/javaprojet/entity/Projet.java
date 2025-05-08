@@ -5,6 +5,7 @@ import java.util.Set;
 
 import jakarta.persistence.*;
 import lombok.Data;
+
 @Entity
 @Data
 public class Projet {
@@ -51,6 +52,20 @@ public class Projet {
     )
     private Set<Utilisateur> admins = new HashSet<>();
 
+    // Ajout d'une référence explicite à l'admin principal
+    @ManyToOne
+    @JoinColumn(name = "admin_principal_id")
+    private Utilisateur admin;
+
+    // Liste des utilisateurs ayant demandé à rejoindre le projet
+    @ManyToMany
+    @JoinTable(
+            name = "projet_demandeurs",
+            joinColumns = @JoinColumn(name = "projet_id"),
+            inverseJoinColumns = @JoinColumn(name = "utilisateur_id")
+    )
+    private Set<Utilisateur> demandeursEnAttente = new HashSet<>();
+
     @OneToMany(mappedBy = "projet", cascade = CascadeType.ALL)
     private Set<Tache> taches = new HashSet<>();
 
@@ -69,6 +84,4 @@ public class Projet {
 
     @OneToMany(mappedBy = "projet", cascade = CascadeType.ALL)
     private Set<SalleDiscussion> sallesDiscussion = new HashSet<>();
-
-
 }
