@@ -10,4 +10,6 @@ public interface UtilisateurRepesitory extends JpaRepository<Utilisateur,Long> {
     List<Utilisateur> findByEmailAndMotDePasse(String email, String motDePasse);
     //List<Utilisateur> findByIdAndIdAndProjets(Long id, Projet projet);
     Utilisateur findUtilisateurByID(long id);
+
+    List<Utilisateur> findByNomContainingIgnoreCase(String nom);
 }
