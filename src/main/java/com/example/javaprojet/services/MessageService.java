@@ -19,6 +19,7 @@ public class MessageService {
 
     private final MessageRepository messageRepository;
 
+    @Transactional(readOnly = true)
     public Optional<Message> getMessageById(Long id) {
         return messageRepository.findById(id);
     }
@@ -28,10 +29,12 @@ public class MessageService {
         return messageRepository.save(message);
     }
 
+    @Transactional(readOnly = true)
     public List<Message> getMessagesBySalle(SalleDiscussion salle) {
         return messageRepository.findBySalleOrderByDateEnvoiAsc(salle);
     }
 
+    @Transactional(readOnly = true)
     public List<Message> getMessagesBySalleId(Long salleId) {
         return messageRepository.findBySalle_IdOrderByDateEnvoiAsc(salleId);
     }
@@ -63,8 +66,17 @@ public class MessageService {
     }
 
     @Transactional
-    public Message creerUserLeaveMessage(Object utilisateur, SalleDiscussion salle) {
-        return null;
+    public Message creerUserLeaveMessage(Utilisateur utilisateur, SalleDiscussion salle) {
+        Message message = Message.builder()
+                .idExpediteur(utilisateur.getId())
+                .expediteur(utilisateur)
+                .contenu(utilisateur.getNom() + " a quitté la salle")
+                .dateEnvoi(new Date())
+                .salle(salle)
+                .type(MessageType.LEAVE)
+                .estLu(false)
+                .build();
+        return messageRepository.save(message);
     }
 
     @Transactional
@@ -79,7 +91,6 @@ public class MessageService {
     public void marquerTousCommeLus(Long salleId, Long utilisateurId) {
         List<Message> messages = messageRepository.findByEstLuFalseAndSalle_Id(salleId);
         messages.forEach(message -> {
-            // Ne pas marquer ses propres messages comme lus
             if (message.getIdExpediteur() == null || !message.getIdExpediteur().equals(utilisateurId)) {
                 message.setEstLu(true);
                 messageRepository.save(message);
@@ -91,8 +102,4 @@ public class MessageService {
     public void supprimerMessage(Long messageId) {
         messageRepository.deleteById(messageId);
     }
-
-    public Message creerUserLeaveMessage(Object utilisateur, SalleDiscussion salle) {
-    }
 }
-

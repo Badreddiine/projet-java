@@ -1,8 +1,8 @@
 package com.example.javaprojet.services;
 
 import com.example.javaprojet.entity.*;
-import com.example.javaprojet.model.Role;
 import com.example.javaprojet.model.RoleType;
+import com.example.javaprojet.model.StatutProjet;
 import com.example.javaprojet.repo.*;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.DefaultAuthenticationEventPublisher;
 import org.springframework.stereotype.Service;
 
+import java.lang.ScopedValue;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -41,7 +42,7 @@ public class UtilisateurService {
     public void creeCompte(Utilisateur utilisateur) {
         List<Utilisateur> listExist = utilisateurRepesitory.findByEmail(utilisateur.getEmail());
         if (listExist.isEmpty()) {
-            utilisateur.setRole(Role.GUEST);
+            utilisateur.setRole(RoleType.GUEST);
             utilisateurRepesitory.save(utilisateur);
             System.out.println("Compte créé avec succès !");
         } else {
@@ -80,7 +81,7 @@ public class UtilisateurService {
             throw new IllegalStateException("L'admin doit être membre du groupe");
         }
 
-        projet.setEtat("EN_ATTENTE");
+        projet.setStatutProjet(StatutProjet.EN_ATTENTE);
         projet.setGroupe(groupe);
         projet.setAdmin(admin);
         projet.setDateCreation(new Date());
@@ -219,7 +220,7 @@ public class UtilisateurService {
         Utilisateur utilisateur = getUtilisateurById(utilisateurId);
         if (utilisateur != null) {
             Hibernate.initialize(utilisateur.getProjets());
-            return utilisateur.getProjets();
+            return (List<Projet>) utilisateur.getProjets();
         }
         return List.of();
     }
@@ -233,5 +234,8 @@ public class UtilisateurService {
             return true;
         }
         return false;
+    }
+
+    public ScopedValue<Object> findById(Long userId) {
     }
 }

@@ -1,5 +1,4 @@
 package com.example.javaprojet.config;
-
 import com.example.javaprojet.entity.Message;
 import com.example.javaprojet.entity.Utilisateur;
 import com.example.javaprojet.services.MessageService;
@@ -12,6 +11,8 @@ import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
+
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor
@@ -37,13 +38,15 @@ public class WebSocketEventListener {
             // Récupérer la salle concernée
             salleDiscussionService.getSalleById(salleId).ifPresent(salle -> {
                 // Trouver l'utilisateur par nom
-                utilisateurService.findByNom(username).set(utilisateur -> {
+                List<Utilisateur> utilisateurs = utilisateurService.findByNom(username);
+                if (!utilisateurs.isEmpty()) {
+                    Utilisateur utilisateur = utilisateurs.get(0);
                     // Créer un message de déconnexion
                     Message message = messageService.creerUserLeaveMessage(utilisateur, salle);
 
                     // Envoyer au topic approprié
                     messagingTemplate.convertAndSend(salle.getTopic(), message);
-                });
+                }
             });
         }
     }
