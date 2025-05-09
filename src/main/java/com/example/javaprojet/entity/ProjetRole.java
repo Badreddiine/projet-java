@@ -24,10 +24,13 @@ public class ProjetRole {
 
     @Enumerated(EnumType.STRING)
     private RoleType role;
+    @Enumerated(EnumType.STRING)
+    private RoleSecondaire roleSecondaire;
 
     public ProjetRole(Projet projet, Utilisateur demandeur, RoleSecondaire roleSecondaire) {
         this.projet = projet;
         this.utilisateur = demandeur;
+        this.roleSecondaire = roleSecondaire;
     }
 
 
