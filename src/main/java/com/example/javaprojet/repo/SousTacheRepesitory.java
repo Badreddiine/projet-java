@@ -7,4 +7,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
  * @author $ {USERS}
  **/
 public interface SousTacheRepesitory extends JpaRepository<SousTache, Long> {
+   List<SousTache> findByTache_Id(Long tacheId);
+    List<SousTache> findByEtat(String etat);
 }
