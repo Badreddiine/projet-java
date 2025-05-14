@@ -2,7 +2,7 @@ package com.example.javaprojet.repo;
 
 import com.example.javaprojet.entity.SousTache;
 import org.springframework.data.jpa.repository.JpaRepository;
-
+import java.util.List;
 /**
  * @author $ {USERS}
  **/

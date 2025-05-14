@@ -1,21 +1,34 @@
-package com.example.javaprojet.security;
+package com.example.javaprojet.entity;
 
-import com.example.javaprojet.entity.Utilisateur;
+import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.oauth2.core.user.OAuth2User;
 
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-public class UserPrincipal implements UserDetails, OAuth2User {
+@Entity
+@Setter
+@Getter
+@NoArgsConstructor // Ajoute un constructeur sans arguments
+public class UserPrincipal implements UserDetails {
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
+
     private String email;
     private String password;
+
+    @Transient // Ne pas persister cette collection dans la base de données
     private Collection<? extends GrantedAuthority> authorities;
+
+    @Transient // Ne pas persister cette map dans la base de données
     private Map<String, Object> attributes;
 
     public UserPrincipal(Long id, String email, String password, Collection<? extends GrantedAuthority> authorities) {
@@ -44,56 +57,30 @@ public class UserPrincipal implements UserDetails, OAuth2User {
         return userPrincipal;
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    @Override
-    public String getName() {
-        return String.valueOf(id);
-    }
+    // Implémentation des méthodes manquantes de UserDetails
 
     @Override
     public String getUsername() {
-        return email;
-    }
-
-    @Override
-    public String getPassword() {
-        return password;
-    }
-
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return authorities;
+        return email; // Utilisez l'email comme nom d'utilisateur
     }
 
     @Override
     public boolean isAccountNonExpired() {
-        return true;
+        return true; // Compte toujours valide
     }
 
     @Override
     public boolean isAccountNonLocked() {
-        return true;
+        return true; // Compte jamais verrouillé
     }
 
     @Override
     public boolean isCredentialsNonExpired() {
-        return true;
+        return true; // Identifiants toujours valides
     }
 
     @Override
     public boolean isEnabled() {
-        return true;
-    }
-
-    @Override
-    public Map<String, Object> getAttributes() {
-        return attributes;
-    }
-
-    public void setAttributes(Map<String, Object> attributes) {
-        this.attributes = attributes;
+        return true; // Compte toujours activé
     }
 }

@@ -4,13 +4,11 @@ import java.util.HashSet;
 import java.util.Set;
 import com.example.javaprojet.model.TypeSalle;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Entity
-@Data
+@Setter
+@Getter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder

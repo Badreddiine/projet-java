@@ -1,5 +1,6 @@
 package com.example.javaprojet.security;
 
+import com.example.javaprojet.entity.UserPrincipal;
 import com.example.javaprojet.entity.Utilisateur;
 import com.example.javaprojet.repo.UtilisateurRepesitory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +27,7 @@ public class CustomUserDetailsService implements UserDetailsService {
         }
 
         Utilisateur utilisateur = users.get(0);
-        return com.example.javaprojet.security.UserPrincipal.create(utilisateur);
+        return UserPrincipal.create(utilisateur);
     }
 
     @Transactional
@@ -34,7 +35,7 @@ public class CustomUserDetailsService implements UserDetailsService {
         Utilisateur utilisateur = utilisateurRepesitory.findById(id)
                 .orElseThrow(() -> new UsernameNotFoundException("Utilisateur introuvable avec l'id : " + id));
 
-        return com.example.javaprojet.security.UserPrincipal.create(utilisateur);
+        return UserPrincipal.create(utilisateur);
     }
 }
 

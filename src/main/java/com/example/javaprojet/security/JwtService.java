@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
-
+import com.example.javaprojet.entity.UserPrincipal;
 import java.security.Key;
 import java.util.Date;
 import java.util.HashMap;

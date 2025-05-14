@@ -8,7 +8,7 @@ import com.example.javaprojet.entity.Utilisateur;
 import com.example.javaprojet.MAPPERS.UtilisateurMapper;
 import com.example.javaprojet.repo.UtilisateurRepesitory;
 import com.example.javaprojet.security.JwtService;
-import com.example.javaprojet.security.UserPrincipal;
+import com.example.javaprojet.entity.UserPrincipal;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
