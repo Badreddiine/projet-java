@@ -1,8 +1,10 @@
 package com.example.javaprojet.config;
+
 import com.example.javaprojet.entity.Utilisateur;
 import com.example.javaprojet.services.UtilisateurService;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -12,7 +14,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Component
-@RequiredArgsConstructor
 @Slf4j
 public class PresenceTracker {
 
@@ -24,6 +25,13 @@ public class PresenceTracker {
 
     // Intervalle en millisecondes pour considérer un utilisateur comme inactif (5 minutes)
     private static final long INACTIVE_THRESHOLD = 5 * 60 * 1000;
+
+    // Utilisation de @Autowired + constructeur au lieu de @RequiredArgsConstructor
+    @Autowired
+    public PresenceTracker(UtilisateurService utilisateurService, @Lazy SimpMessagingTemplate messagingTemplate) {
+        this.utilisateurService = utilisateurService;
+        this.messagingTemplate = messagingTemplate;
+    }
 
     /**
      * Marquer un utilisateur comme connecté

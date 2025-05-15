@@ -42,6 +42,9 @@ public class Message {
     @ManyToOne
     @JoinColumn(name = "id_salle")
     private SalleDiscussion salle;
+    @ManyToOne
+    @JoinColumn(name = "id_destinataire")
+    private Utilisateur destinataire;
 }
 
 

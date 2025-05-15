@@ -74,7 +74,7 @@ public class Utilisateur {
     private List<Message> messagesEnvoyes = new ArrayList<>();
 
     @OneToMany(mappedBy = "destinataire")
-    private List<Message> messagesRecus = new ArrayList<>();
+    private List<Message> messagesRecus;
 
     @OneToMany(mappedBy = "proprietaire")
     private Set<Calendrier> calendriers = new HashSet<>();

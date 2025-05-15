@@ -6,10 +6,12 @@ import com.example.javaprojet.model.StatutProjet;
 import com.example.javaprojet.repo.*;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
+import org.apache.catalina.User;
 import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.DefaultAuthenticationEventPublisher;
 import org.springframework.stereotype.Service;
+
 
 import java.util.Date;
 import java.util.List;
@@ -230,4 +232,9 @@ public class UtilisateurService {
         }
         return false;
     }
+
+        public Optional<Utilisateur> findById(Long id) {
+        return utilisateurRepesitory.findById(id);
+    }
+
 }

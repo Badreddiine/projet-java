@@ -11,6 +11,8 @@ import java.util.Set;
 @Data
 @Entity
 @AllArgsConstructor
+@Getter
+@Setter
 public class Projet {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -16,6 +16,7 @@ import java.util.List;
 @Builder
 public class SalleDiscussionDTO {
     private Long id;
+    private int idSalle;
     private String nom;
     private String description;
     private TypeSalle typeSalle;

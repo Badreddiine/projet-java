@@ -18,13 +18,6 @@ import java.util.function.Function;
 @Service
 public class JwtService {
 
-    @Autowired
-    private JwtConfig jwtConfig;
-
-    private Key getSigningKey() {
-        byte[] keyBytes = jwtConfig.getSecret().getBytes();
-        return Keys.hmacShaKeyFor(keyBytes);
-    }
 
     public String generateToken(Authentication authentication) {
         UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();

@@ -36,13 +36,13 @@ public class SalleDiscussionMapper {
 
         return SalleDiscussionDTO.builder()
                 .id(salle.getId())
-                .nom(salle.getNom())
+
                 .description(salle.getDescription())
                 .typeSalle(salle.getTypeSalle())
                 .estPublique(salle.isEstPublique())
                 .dateCreation(salle.getDateCreation())
                 .idProjet(salle.getProjet() != null ? salle.getProjet().getId() : null)
-                .nomProjet(salle.getProjet() != null ? salle.getProjet().getNom() : null)
+                .nomProjet(salle.getProjet() != null ? salle.getProjet().getNomCourt() : null)
                 .idGroupe(salle.getGroupe() != null ? salle.getGroupe().getId() : null)
                 .nomGroupe(salle.getGroupe() != null ? salle.getGroupe().getNom() : null)
                 .idCreateur(salle.getCreateur() != null ? salle.getCreateur().getId() : null)

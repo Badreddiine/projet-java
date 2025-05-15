@@ -18,7 +18,7 @@ public class RoleService {
         boolean hasAccess;
         if (projet != null) {
             hasAccess = projetRoleRepository.existsByUtilisateurAndProjetAndRole(user, projet, requiredRole) ||
-                    projetRoleRepository.existsByUtilisateurAndRole(user, RoleType.ADMIN_GLOBAL);
+                    projetRoleRepository.existsByUtilisateurAndRole(user, RoleType.ADMIN);
         } else {
             hasAccess = projetRoleRepository.existsByUtilisateurAndRole(user, requiredRole);
         }
@@ -29,7 +29,7 @@ public class RoleService {
     }
     public boolean hasRole(Utilisateur user, Projet projet, RoleType requiredRole) {
         // ADMIN_GLOBAL bypass toutes les vérifications
-        if (projetRoleRepository.existsByUtilisateurAndRole(user, RoleType.ADMIN_GLOBAL)) {
+        if (projetRoleRepository.existsByUtilisateurAndRole(user, RoleType.ADMIN)) {
             return true;
         }
         return projet != null

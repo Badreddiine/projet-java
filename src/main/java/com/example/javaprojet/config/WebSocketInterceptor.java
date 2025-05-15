@@ -1,6 +1,9 @@
 package com.example.javaprojet.config;
+import com.example.javaprojet.services.UtilisateurService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
@@ -14,8 +17,16 @@ import java.security.Principal;
 @RequiredArgsConstructor
 @Slf4j
 public class WebSocketInterceptor implements ChannelInterceptor {
+    private PresenceTracker presenceTracker;
+    private final UtilisateurService utilisateurService;
 
-    private final PresenceTracker presenceTracker;
+    // Utilisation de @Lazy pour éviter la dépendance circulaire
+    @Autowired
+    public WebSocketInterceptor(UtilisateurService utilisateurService, @Lazy PresenceTracker presenceTracker) {
+        this.utilisateurService = utilisateurService;
+        this.presenceTracker = presenceTracker;
+    }
+
 
     @Override
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
