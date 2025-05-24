@@ -2,6 +2,7 @@ package com.example.javaprojet.entity;
 import com.example.javaprojet.model.MessageType;
 import jakarta.persistence.*;
 import lombok.*;
+import net.minidev.json.annotate.JsonIgnore;
 
 import java.util.Date;
 
@@ -9,8 +10,7 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Getter
-@Setter
+@Data
 public class Message {
 
     @Id
@@ -32,17 +32,21 @@ public class Message {
     @Enumerated(EnumType.STRING)
     private MessageType type;
 
-    @ManyToOne
+    @JsonIgnore
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "id_expediteur", insertable = false, updatable = false)
     private Utilisateur expediteur;
 
     @Column(name = "id_expediteur")
     private Long idExpediteur;
 
-    @ManyToOne
+    @JsonIgnore
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "id_salle")
     private SalleDiscussion salle;
-    @ManyToOne
+
+    @JsonIgnore
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "id_destinataire")
     private Utilisateur destinataire;
 }

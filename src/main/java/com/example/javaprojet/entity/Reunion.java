@@ -6,11 +6,13 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import net.minidev.json.annotate.JsonIgnore;
 
 @Entity
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+
 public class Reunion {
 
     @Id
@@ -31,11 +33,13 @@ public class Reunion {
 
     private boolean estObligatoire;
 
-    @ManyToOne
+    @JsonIgnore
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_projet")
     private Projet projet;
 
-    @ManyToMany
+    @JsonIgnore
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "reunion_utilisateur",
             joinColumns = @JoinColumn(name = "reunion_id"),

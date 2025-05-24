@@ -36,14 +36,14 @@ public class UtilisateurService {
     @Autowired
     private DefaultAuthenticationEventPublisher authenticationEventPublisher;
 
-    public void creeCompte(Utilisateur utilisateur) {
+    public void creeCompte(Utilisateur utilisateur) throws Exception {
         List<Utilisateur> listExist = utilisateurRepesitory.findByEmail(utilisateur.getEmail());
         if (listExist.isEmpty()) {
             utilisateur.setRole(RoleType.GUEST);
             utilisateurRepesitory.save(utilisateur);
             System.out.println("Compte créé avec succès !");
         } else {
-            System.out.println("User deja exist!");
+            throw new Exception("User already exist!");
         }
     }
 

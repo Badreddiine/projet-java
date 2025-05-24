@@ -5,6 +5,7 @@ import com.example.javaprojet.model.RoleSecondaire;
 import com.example.javaprojet.model.RoleType;
 import jakarta.persistence.*;
 import lombok.Data;
+import net.minidev.json.annotate.JsonIgnore;
 
 @Entity
 @Data
@@ -60,23 +61,27 @@ public class Utilisateur {
     // Pour le refresh token (JWT)
     @Column(length = 1000)
     private String refreshToken;
-
-    @ManyToMany(mappedBy = "membres")
+    @JsonIgnore
+    @ManyToMany(mappedBy = "membres",fetch = FetchType.LAZY)
     private Set<Groupe> groupes = new HashSet<>();
 
     @ManyToMany(mappedBy = "membres")
     private Set<Projet> projets = new HashSet<>();
 
-    @ManyToMany(mappedBy = "admins")
+    @JsonIgnore
+    @ManyToMany(mappedBy = "admins",fetch = FetchType.LAZY)
     private Set<Projet> projetsAdministres = new HashSet<>();
 
-    @OneToMany(mappedBy = "expediteur")
+    @JsonIgnore
+    @OneToMany(mappedBy = "expediteur",fetch = FetchType.LAZY)
     private List<Message> messagesEnvoyes = new ArrayList<>();
 
-    @OneToMany(mappedBy = "destinataire")
+    @JsonIgnore
+    @OneToMany(mappedBy = "destinataire",fetch = FetchType.LAZY)
     private List<Message> messagesRecus;
 
-    @OneToMany(mappedBy = "proprietaire")
+    @JsonIgnore
+    @OneToMany(mappedBy = "proprietaire",fetch = FetchType.LAZY)
     private Set<Calendrier> calendriers = new HashSet<>();
 
     // Méthodes utilitaires pour le statut de connexion
@@ -294,4 +299,5 @@ public class Utilisateur {
     public void setCalendriers(Set<Calendrier> calendriers) {
         this.calendriers = calendriers;
     }
+
 }

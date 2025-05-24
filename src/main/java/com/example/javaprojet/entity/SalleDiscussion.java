@@ -5,10 +5,10 @@ import java.util.Set;
 import com.example.javaprojet.model.TypeSalle;
 import jakarta.persistence.*;
 import lombok.*;
+import net.minidev.json.annotate.JsonIgnore;
 
 @Entity
-@Setter
-@Getter
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -31,18 +31,22 @@ public class SalleDiscussion {
     @Temporal(TemporalType.TIMESTAMP)
     private Date dateCreation;
 
-    @ManyToOne
+    @JsonIgnore
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_projet")
     private Projet projet;
 
-    @ManyToOne
+    @JsonIgnore
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_groupe")
     private Groupe groupe;
 
-    @OneToMany(mappedBy = "salle", cascade = CascadeType.ALL)
+    @JsonIgnore
+    @OneToMany(mappedBy = "salle", cascade = CascadeType.ALL,fetch = FetchType.LAZY)
     private Set<Message> messages = new HashSet<>();
 
-    @ManyToMany
+    @JsonIgnore
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "salle_utilisateur",
             joinColumns = @JoinColumn(name = "salle_id"),
@@ -50,7 +54,8 @@ public class SalleDiscussion {
     )
     private Set<Utilisateur> membres = new HashSet<>();
 
-    @ManyToOne
+    @JsonIgnore
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "createur_id")
     private Utilisateur createur;
 

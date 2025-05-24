@@ -223,7 +223,11 @@ public class ProjetService {
 
         demandeur.setRoleSecondaire(RoleSecondaire.MEMBRE_PTOJET);
         projet.getMembres().add(demandeur);
-        projetRoleRepository.save(new ProjetRole(projet, demandeur, RoleSecondaire.MEMBRE_PTOJET));
+        projetRoleRepository.save( ProjetRole.builder()
+                .projet(projet)
+                .roleSecondaire(RoleSecondaire.MEMBRE_PTOJET)
+                .utilisateur(demandeur).build()
+        );
         projetRepesitory.save(projet);
     }
 

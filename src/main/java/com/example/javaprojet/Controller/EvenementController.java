@@ -15,7 +15,7 @@ public class EvenementController {
 
     private final EvenementService evenementService;
 
-    @Autowired
+
     public EvenementController(EvenementService evenementService) {
         this.evenementService = evenementService;
     }

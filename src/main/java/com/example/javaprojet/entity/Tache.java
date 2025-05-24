@@ -5,6 +5,8 @@ import java.util.Set;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import net.minidev.json.annotate.JsonIgnore;
+
 @Entity
 @Data
 public class Tache {
@@ -32,14 +34,17 @@ public class Tache {
 
     private int notation;
 
-    @ManyToOne
+    @JsonIgnore
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_projet")
     private Projet projet;
 
-    @OneToMany(mappedBy = "tache", cascade = CascadeType.ALL)
+    @JsonIgnore
+    @OneToMany(mappedBy = "tache", cascade = CascadeType.ALL,fetch = FetchType.LAZY)
     private Set<SousTache> sousTaches = new HashSet<>();
 
-    @ManyToOne
+    @JsonIgnore
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_utilisateur")
     private Utilisateur assigneA;
 

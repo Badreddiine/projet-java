@@ -4,13 +4,13 @@ import java.util.HashSet;
 import java.util.Set;
 
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
+import net.minidev.json.annotate.JsonIgnore;
 
 @Entity
-@Getter
-@Setter
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class Groupe {
 
     @Id
@@ -27,7 +27,8 @@ public class Groupe {
     @Temporal(TemporalType.TIMESTAMP)
     private Date dateCreation;
 
-    @ManyToMany
+    @JsonIgnore
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinTable(
             name = "groupe_utilisateur",
             joinColumns = @JoinColumn(name = "groupe_id"),
@@ -35,64 +36,10 @@ public class Groupe {
     )
     private Set<Utilisateur> membres = new HashSet<>();
 
-    @OneToMany
+    @JsonIgnore
+    @OneToMany(fetch = FetchType.LAZY,cascade = CascadeType.ALL)
     @JoinColumn(name = "groupe_id")
     private Set<Projet> projets = new HashSet<>();
 
-    public Long getId() {
-        return id;
-    }
-
-    public String getNom() {
-        return nom;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public boolean isEstSysteme() {
-        return estSysteme;
-    }
-
-    public Date getDateCreation() {
-        return dateCreation;
-    }
-
-    public Set<Utilisateur> getMembres() {
-        return membres;
-    }
-
-    public Set<Projet> getProjets() {
-        return projets;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public void setNom(String nom) {
-        this.nom = nom;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public void setEstSysteme(boolean estSysteme) {
-        this.estSysteme = estSysteme;
-    }
-
-    public void setDateCreation(Date dateCreation) {
-        this.dateCreation = dateCreation;
-    }
-
-    public void setMembres(Set<Utilisateur> membres) {
-        this.membres = membres;
-    }
-
-    public void setProjets(Set<Projet> projets) {
-        this.projets = projets;
-    }
 }
 

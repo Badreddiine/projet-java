@@ -34,7 +34,7 @@ public class AuthService {
     @Autowired
     private UtilisateurMapper utilisateurMapper;
 
-    public AuthResponseDTO authenticateUser(AuthRequestDTO loginRequest) {
+    public AuthResponseDTO authenticateUser(AuthRequestDTO loginRequest) throws RuntimeException {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         loginRequest.getEmail(),

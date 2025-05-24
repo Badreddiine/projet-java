@@ -1,7 +1,9 @@
 package com.example.javaprojet.MAPPERS;
+
 import com.example.javaprojet.dto.UtilisateurDTO;
 import com.example.javaprojet.entity.Utilisateur;
 import org.springframework.stereotype.Component;
+// **Plus aucun import de jdk.jshell.Snippet ici**
 
 @Component
 public class UtilisateurMapper {

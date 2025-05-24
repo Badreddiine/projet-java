@@ -17,11 +17,7 @@ public class UtilisateursController {
     @Autowired
     private UtilisateurService utilisateurService;
 
-    @PostMapping("/inscription")
-    public ResponseEntity<String> creerCompte(@RequestBody Utilisateur utilisateur) {
-        utilisateurService.creeCompte(utilisateur);
-        return ResponseEntity.ok("Compte créé avec succès !");
-    }
+
 
     @PostMapping("/connexion")
     public ResponseEntity<String> seConnecter(@RequestParam String email, @RequestParam String motDePasse) {

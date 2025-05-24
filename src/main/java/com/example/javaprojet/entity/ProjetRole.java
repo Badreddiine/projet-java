@@ -4,22 +4,27 @@ import com.example.javaprojet.model.RoleSecondaire;
 import com.example.javaprojet.model.RoleType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import net.minidev.json.annotate.JsonIgnore;
 
 @Data
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class ProjetRole {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
+    @JsonIgnore
+    @ManyToOne(fetch = FetchType.LAZY)
     private Utilisateur utilisateur;
 
-    @ManyToOne
+    @JsonIgnore
+    @ManyToOne(fetch = FetchType.LAZY)
     private Projet projet;
 
     @Enumerated(EnumType.STRING)
@@ -27,42 +32,5 @@ public class ProjetRole {
     @Enumerated(EnumType.STRING)
     private RoleSecondaire roleSecondaire;
 
-    public ProjetRole(Projet projet, Utilisateur demandeur, RoleSecondaire roleSecondaire) {
-        this.projet = projet;
-        this.utilisateur = demandeur;
-        this.roleSecondaire = roleSecondaire;
-    }
 
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Utilisateur getUtilisateur() {
-        return utilisateur;
-    }
-
-    public void setUtilisateur(Utilisateur utilisateur) {
-        this.utilisateur = utilisateur;
-    }
-
-    public Projet getProjet() {
-        return projet;
-    }
-
-    public void setProjet(Projet projet) {
-        this.projet = projet;
-    }
-
-    public RoleType getRole() {
-        return role;
-    }
-
-    public void setRole(RoleType role) {
-        this.role = role;
-    }
 }

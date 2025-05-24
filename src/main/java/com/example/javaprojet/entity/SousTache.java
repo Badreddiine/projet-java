@@ -1,8 +1,11 @@
 package com.example.javaprojet.entity;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import net.minidev.json.annotate.JsonIgnore;
 
 @Entity
 @Data
@@ -21,7 +24,7 @@ public class SousTache {
     @ElementCollection
     @CollectionTable(name = "sous_tache_tags", joinColumns = @JoinColumn(name = "sous_tache_id"))
     @Column(name = "tag")
-    private String[] tags;
+    private List<String> tags=new ArrayList<>();
 
     @Temporal(TemporalType.TIMESTAMP)
     private Date dateDebut;
@@ -33,7 +36,8 @@ public class SousTache {
 
     private boolean estTerminee;
 
-    @ManyToOne
+    @JsonIgnore
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_tache")
     private Tache tache;
 

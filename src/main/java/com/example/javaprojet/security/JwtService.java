@@ -1,6 +1,5 @@
 package com.example.javaprojet.security;
 
-
 import com.example.javaprojet.config.JwtConfig;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
@@ -9,6 +8,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import com.example.javaprojet.entity.UserPrincipal;
+
 import java.security.Key;
 import java.util.Date;
 import java.util.HashMap;
@@ -18,6 +18,13 @@ import java.util.function.Function;
 @Service
 public class JwtService {
 
+    @Autowired
+    private JwtConfig jwtConfig;
+
+    private Key getSigningKey() {
+        byte[] keyBytes = jwtConfig.getSecret().getBytes();
+        return Keys.hmacShaKeyFor(keyBytes);
+    }
 
     public String generateToken(Authentication authentication) {
         UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();

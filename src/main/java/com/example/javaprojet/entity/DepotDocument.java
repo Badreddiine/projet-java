@@ -1,35 +1,21 @@
 package com.example.javaprojet.entity;
-import jakarta.persistence.Entity;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 import lombok.*;
+import net.minidev.json.annotate.JsonIgnore;
 
 @Entity
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 @AllArgsConstructor
+@Data
 public class DepotDocument extends Ressource {
 
     private boolean estPublic;
 
-    @ManyToOne
+    @JsonIgnore
+    @ManyToOne(fetch = FetchType.LAZY,cascade = CascadeType.ALL)
     @JoinColumn(name = "id_projet")
     private Projet projet;
 
-    public boolean isEstPublic() {
-        return estPublic;
-    }
-
-    public void setEstPublic(boolean estPublic) {
-        this.estPublic = estPublic;
-    }
-
-    public Projet getProjet() {
-        return projet;
-    }
-
-    public void setProjet(Projet projet) {
-        this.projet = projet;
-    }
 
 }

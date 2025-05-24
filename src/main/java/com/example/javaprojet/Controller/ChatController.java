@@ -33,7 +33,7 @@ public class ChatController {
     private final SalleDiscussionService salleDiscussionService;
     private final MessageMapper messageMapper;
 
-    @MessageMapping("/chat.sendMessageV2/{salleId}")
+    @MessageMapping("/chat.sendMessage/{salleId}")
     public void sendMessage(@Payload MessageDTO messageDTO,
                             @DestinationVariable Long salleId,
                             Principal principal) {
