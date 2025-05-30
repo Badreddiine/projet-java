@@ -1,6 +1,7 @@
 package com.example.javaprojet.services;
 
 import com.example.javaprojet.entity.*;
+import com.example.javaprojet.model.RoleSecondaire;
 import com.example.javaprojet.model.RoleType;
 import com.example.javaprojet.model.StatutProjet;
 import com.example.javaprojet.repo.*;
@@ -10,6 +11,7 @@ import org.apache.catalina.User;
 import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.DefaultAuthenticationEventPublisher;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 
@@ -34,12 +36,17 @@ public class UtilisateurService {
     private ProjetRoleRepository projetRoleRepository;
 
     @Autowired
+    PasswordEncoder passwordEncoder;
+
+    @Autowired
     private DefaultAuthenticationEventPublisher authenticationEventPublisher;
 
     public void creeCompte(Utilisateur utilisateur) throws Exception {
         List<Utilisateur> listExist = utilisateurRepesitory.findByEmail(utilisateur.getEmail());
         if (listExist.isEmpty()) {
             utilisateur.setRole(RoleType.GUEST);
+            utilisateur.setRoleSecondaire(RoleSecondaire.ADMIN_PROJET);
+            utilisateur.setMotDePasse(passwordEncoder.encode(utilisateur.getMotDePasse()));
             utilisateurRepesitory.save(utilisateur);
             System.out.println("Compte créé avec succès !");
         } else {

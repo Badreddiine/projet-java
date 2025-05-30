@@ -28,6 +28,7 @@ public class AuthController {
         try{
             return ResponseEntity.ok(authService.authenticateUser(loginRequest));
         } catch(Exception e){
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
     }
