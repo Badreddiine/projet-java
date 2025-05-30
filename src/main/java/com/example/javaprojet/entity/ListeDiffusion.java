@@ -3,6 +3,7 @@ package com.example.javaprojet.entity;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.example.javaprojet.dto.ListDiffusionDTO;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -34,5 +35,12 @@ public class ListeDiffusion extends Ressource {
             inverseJoinColumns = @JoinColumn(name = "utilisateur_id")
     )
     private Set<Utilisateur> abonnes = new HashSet<>();
+
+    public ListeDiffusion(ListDiffusionDTO listDiffusionDTO) {
+        setDescription(listDiffusionDTO.getDescription());
+        setEstSysteme(listDiffusionDTO.isEstSysteme());
+        setProjet(listDiffusionDTO.getProjet());
+        setAbonnes(new HashSet<>());
+    }
 
 }

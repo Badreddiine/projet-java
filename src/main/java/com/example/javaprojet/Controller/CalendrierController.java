@@ -1,5 +1,6 @@
 package com.example.javaprojet.Controller;
 
+import com.example.javaprojet.dto.CalendrierDTO;
 import com.example.javaprojet.entity.Calendrier;
 import com.example.javaprojet.services.CalendrierService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/calendriers")
@@ -26,10 +28,13 @@ public class CalendrierController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Calendrier> getCalendrierById(@PathVariable Long id) {
-        return calendrierService.findById(id)
-                .map(calendrier -> new ResponseEntity<>((Calendrier) calendrier, HttpStatus.OK))
-                .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+    public ResponseEntity<CalendrierDTO> getCalendrierById(@PathVariable Long id) {
+        Optional<Calendrier> calendrier = calendrierService.findById(id);
+        if (calendrier.isPresent()) {
+            return new ResponseEntity<>(new CalendrierDTO(calendrier.get()), HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
 
     @GetMapping

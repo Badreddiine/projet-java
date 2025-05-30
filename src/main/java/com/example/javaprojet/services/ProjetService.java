@@ -279,5 +279,8 @@ public class ProjetService {
         return new ArrayList<>(projet.getDemandeursEnAttente());
     }
 
+    public List<Projet> getProjet(){
+        return projetRepesitory.findAll();
+    }
 }
 

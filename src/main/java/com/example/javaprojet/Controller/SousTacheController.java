@@ -104,4 +104,9 @@ public class SousTacheController {
             return ResponseEntity.badRequest().body(null);
         }
     }
+/*
+    @GetMapping
+    public List<SousTache> getAllSousTaches() {
+        return sousTacheService.getSousTaches();
+    }*/
 }

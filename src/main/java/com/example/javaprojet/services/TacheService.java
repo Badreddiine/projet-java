@@ -87,4 +87,9 @@ public class TacheService {
         }
     }
 
+    public List<Tache> getTach(){
+        List<Tache> taches = tacheRepesitory.findAll();
+        return taches;
+    }
+
 }

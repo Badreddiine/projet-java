@@ -6,6 +6,7 @@ import com.example.javaprojet.services.ListeDiffusionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,7 +22,7 @@ public class ListeDiffusionController {
     public ListeDiffusionController(ListeDiffusionService listeDiffusionService) {
         this.listeDiffusionService = listeDiffusionService;
     }
-
+    @Secured({"ROLE_ADMIN_PROJET"})
     @PostMapping
     public ResponseEntity<ListeDiffusion> createListeDiffusion(@RequestBody ListeDiffusion liste) {
         ListeDiffusion created = listeDiffusionService.create(liste);
@@ -40,7 +41,7 @@ public class ListeDiffusionController {
         List<ListeDiffusion> listes = listeDiffusionService.findAll();
         return ResponseEntity.ok(listes);
     }
-
+    @Secured({"ROLE_ADMIN_PROJET"})
     @PutMapping("/{id}")
     public ResponseEntity<ListeDiffusion> updateListeDiffusion(@PathVariable Long id, @RequestBody ListeDiffusion liste) {
         try {

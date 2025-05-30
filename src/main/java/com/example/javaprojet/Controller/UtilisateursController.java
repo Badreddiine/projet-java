@@ -41,6 +41,7 @@ public class UtilisateursController {
         return ResponseEntity.ok("Profil mis à jour avec succès.");
     }
 
+
     @GetMapping("/{id}")
     public ResponseEntity<Utilisateur> getUtilisateur(@PathVariable Long id) {
         Utilisateur utilisateur = utilisateurService.getUtilisateurById(id);

@@ -9,6 +9,8 @@ import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 /**
  * @author $ {USERS}
  **/
@@ -46,5 +48,9 @@ public class GroupeService {
         if(utilisateur != null && groupe != null &&utilisateur.getRole()!= RoleType.ADMIN) {
             groupeRepesitory.deleteById(idGroupe);
         }
+    }
+
+    public List<Groupe> getAllGroupe() {
+        return groupeRepesitory.findAll();
     }
 }

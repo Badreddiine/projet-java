@@ -1,7 +1,6 @@
 package com.example.javaprojet.services;
 
 import com.example.javaprojet.entity.SousTache;
-import com.example.javaprojet.entity.Tache;
 import com.example.javaprojet.repo.SousTacheRepesitory;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +31,7 @@ public class SousTacheService {
             sousTache.setDateDebut(sousTacheModifiee.getDateDebut());
             sousTache.setDateFin(sousTacheModifiee.getDateFin());
             sousTache.setEtat(sousTacheModifiee.getEtat());
-            sousTache.setEstTerminee(sousTacheModifiee.isEstTerminee());
+            sousTache.setTerminee(sousTacheModifiee.isTerminee());
             return sousTacheRepository.save(sousTache);
         } else {
             throw new RuntimeException("Sous-tâche non trouvée avec l'ID : " + id);
@@ -78,10 +77,14 @@ public class SousTacheService {
         Optional<SousTache> sousTacheExistante = sousTacheRepository.findById(id);
         if (sousTacheExistante.isPresent()) {
             SousTache sousTache = sousTacheExistante.get();
-            sousTache.setEstTerminee(estTerminee);
+            sousTache.setTerminee(estTerminee);
             return sousTacheRepository.save(sousTache);
         } else {
             throw new RuntimeException("Sous-tâche non trouvée avec l'ID : " + id);
         }
+    }
+
+    public List<SousTache> getSousTaches() {
+        return sousTacheRepository.findAll();
     }
 }

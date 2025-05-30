@@ -3,6 +3,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.example.javaprojet.dto.EvenementDTO;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -46,5 +47,15 @@ public class Evenement {
             inverseJoinColumns = @JoinColumn(name = "utilisateur_id")
     )
     private Set<Utilisateur> participants = new HashSet<>();
-
+    public Evenement(EvenementDTO evenementDto) {
+        setId(evenementDto.getId());
+        setTitre(evenementDto.getTitre());
+        setDescription(evenementDto.getDescription());
+        setDateDebut(evenementDto.getDateDebut());
+        setDateFin(evenementDto.getDateFin());
+        setLieu(evenementDto.getLieu());
+        setEstRecurrent(evenementDto.isEstRecurrent());
+        setCalendrier(null);
+        setParticipants(new HashSet<>());
+    }
 }

@@ -4,7 +4,10 @@ import com.example.javaprojet.entity.Groupe;
 import com.example.javaprojet.services.GroupeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * Controller pour gérer les groupes
@@ -15,6 +18,7 @@ public class GroupeController {
 
     @Autowired
     private GroupeService groupeService;
+
 
     @PostMapping("/{idGroupe}/rejoindre")
     public ResponseEntity<String> rejoindreGroupe(
@@ -28,6 +32,7 @@ public class GroupeController {
         }
     }
 
+    @Secured({"ROLE_ADMIN"})
 
     @PostMapping("/creation")
     public ResponseEntity<String> creationGroupe(
@@ -41,6 +46,7 @@ public class GroupeController {
         }
     }
 
+    @Secured({"ROLE_ADMIN"})
 
     @DeleteMapping("/{idGroupe}")
     public ResponseEntity<String> supprimerGroupe(
@@ -52,5 +58,10 @@ public class GroupeController {
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
+    }
+
+    @GetMapping
+    public List<Groupe> getAllGroupes() {
+        return groupeService.getAllGroupe();
     }
 }

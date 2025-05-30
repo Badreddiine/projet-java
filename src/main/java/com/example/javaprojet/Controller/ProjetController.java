@@ -5,6 +5,7 @@ import com.example.javaprojet.entity.Utilisateur;
 import com.example.javaprojet.services.ProjetService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -15,7 +16,7 @@ public class ProjetController {
 
     @Autowired
     private ProjetService projetService;
-
+    @Secured("ROLE_ADMIN")
     @PostMapping("/{projetId}/accepter")
     public ResponseEntity<String> accepterProjet(
             @PathVariable Long projetId,
@@ -27,7 +28,7 @@ public class ProjetController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
-
+    @Secured("ROLE_ADMIN")
     @PostMapping("/{projetId}/rejeter")
     public ResponseEntity<String> rejeterProjet(
             @PathVariable Long projetId,
@@ -40,6 +41,7 @@ public class ProjetController {
         }
     }
 
+    @Secured({"ROLE_ADMIN","ROLE_ADMIN_PROJET"})
 
     @DeleteMapping("/{projetId}")
     public ResponseEntity<String> supprimerProjet(
@@ -54,20 +56,7 @@ public class ProjetController {
     }
 
 
-    @DeleteMapping("/{projetId}/membres/{utilisateurId}")
-    public ResponseEntity<String> supprimerMembre(
-            @PathVariable Long projetId,
-            @PathVariable Long utilisateurId,
-            @RequestParam Long adminId) {
-        try {
-            projetService.supprimerMembre(utilisateurId, adminId, projetId);
-            return ResponseEntity.ok("Utilisateur supprimé du projet");
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
-    }
-
-
+    @Secured({"ROLE_ADMIN", "ROLE_ADMIN_PROJET"})
     @DeleteMapping("/{projetId}/utilisateurs/{utilisateurId}")
     public ResponseEntity<String> supprimerUtilisateurDuProjet(
             @PathVariable Long projetId,
@@ -80,7 +69,7 @@ public class ProjetController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
-
+    @Secured({"ROLE_ADMIN_PROJET"})
     @PostMapping("/{projetId}/demandes/{demandeurId}/accepter")
     public ResponseEntity<String> accepterDemande(
             @PathVariable Long projetId,
@@ -93,7 +82,7 @@ public class ProjetController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
-
+    @Secured({"ROLE_ADMIN_PROJET"})
     @PostMapping("/{projetId}/demandes/{demandeurId}/refuser")
     public ResponseEntity<String> refuserDemande(
             @PathVariable Long projetId,
@@ -106,7 +95,7 @@ public class ProjetController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
-
+    @Secured({"ROLE_ADMIN_PROJET"})
     @GetMapping("/{projetId}/demandes")
     public ResponseEntity<List<Utilisateur>> afficherListDemandeRejoindreProjet(
             @PathVariable Long projetId,
@@ -118,5 +107,10 @@ public class ProjetController {
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(null);
         }
+    }
+
+    @GetMapping
+    public List<Projet> getAllProjets() {
+        return projetService.getProjet();
     }
 }

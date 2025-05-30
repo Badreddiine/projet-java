@@ -2,6 +2,8 @@ package com.example.javaprojet.entity;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
+
+import com.example.javaprojet.dto.ReunionDTO;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -46,4 +48,16 @@ public class Reunion {
             inverseJoinColumns = @JoinColumn(name = "utilisateur_id")
     )
     private Set<Utilisateur> participants = new HashSet<>();
+
+
+    public Reunion(ReunionDTO reuniondto){
+        setTitre(reuniondto.getTitre());
+        setDescription(reuniondto.getDescription());
+        setDate(reuniondto.getDate());
+        setLienMeet(reuniondto.getLienMeet());
+        setDuree(reuniondto.getDuree());
+        setEstObligatoire(reuniondto.isEstObligatoire());
+        projet=null;
+        participants=new HashSet<>();
+    }
 }

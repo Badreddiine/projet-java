@@ -43,7 +43,6 @@ public class CalendrierService {
         return calendrierRepository.findById(id);
     }
 
-
     @Transactional(readOnly = true)
     public List<Calendrier> findAll() {
         return calendrierRepository.findAll();

@@ -3,12 +3,15 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.example.javaprojet.dto.TacheDTO;
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import net.minidev.json.annotate.JsonIgnore;
 
 @Entity
 @Data
+@NoArgsConstructor
 public class Tache {
 
     @Id
@@ -47,6 +50,19 @@ public class Tache {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_utilisateur")
     private Utilisateur assigneA;
-
+public Tache(TacheDTO tacheDTO) {
+    setTitre(tacheDTO.getTitre());
+    setDescription(tacheDTO.getDescription());
+    setDateDebut(tacheDTO.getDateDebut());
+    setDateFin(tacheDTO.getDateFin());
+    setPriorite(tacheDTO.getPriorite());
+    setDifficulte(tacheDTO.getDifficulte());
+    setEtat(tacheDTO.getEtat());
+    setNotation(tacheDTO.getNotation());
+    setProjet(tacheDTO.getProjet());
+    sousTaches=new HashSet<>();
+    assigneA=null;
+    projet=null;
+}
 
 }

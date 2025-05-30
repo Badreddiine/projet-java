@@ -5,6 +5,7 @@ import com.example.javaprojet.entity.Utilisateur;
 import com.example.javaprojet.services.TacheService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,12 +17,13 @@ public class TacheController {
     @Autowired
     private TacheService tacheService;
 
+    @Secured({"ROLE_ADMIN_PROJET"})
     @PostMapping
     public ResponseEntity<Tache> creerTache(@RequestBody Tache tache) {
         Tache nouvelleTache = tacheService.creerTache(tache);
         return ResponseEntity.ok(nouvelleTache);
     }
-
+    @Secured({ "ROLE_ADMIN_PROJET"})
     @PutMapping("/{id}")
     public ResponseEntity<Tache> mettreAJourTache(@PathVariable Long id, @RequestBody Tache tacheModifiee) {
         try {
@@ -31,7 +33,7 @@ public class TacheController {
             return ResponseEntity.notFound().build(); // Si la tâche n'est pas trouvée
         }
     }
-
+    @Secured({"ROLE_ADMIN_PROJET"})
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> supprimerTache(@PathVariable Long id) {
         try {
@@ -95,4 +97,10 @@ public class TacheController {
             return ResponseEntity.notFound().build(); // Si la tâche n'est pas trouvée
         }
     }
+
+ /*   @Secured({"ROLE_ADMIN_PROJET"})
+    @GetMapping
+    public List<Tache> getAllTaches() {
+        return tacheService.getTach();
+    }*/
 }

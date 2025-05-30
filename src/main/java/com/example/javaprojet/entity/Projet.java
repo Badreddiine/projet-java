@@ -1,4 +1,5 @@
 package com.example.javaprojet.entity;
+import com.example.javaprojet.dto.ProjetDTO;
 import com.example.javaprojet.model.RoleSecondaire;
 import com.example.javaprojet.model.StatutProjet;
 import jakarta.persistence.*;
@@ -53,7 +54,6 @@ public class Projet {
     private Set<Utilisateur> membres = new HashSet<>();
 
 
-    // Admin members of the project - this is a many-to-many relationship
     @JsonIgnore
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinTable(
@@ -103,8 +103,6 @@ public class Projet {
     private Set<Utilisateur> demandeursEnAttente = new HashSet<>();
 
 
-
-    // Helper methods for admin management - recommended for consistency
     public void setMainAdmin(Utilisateur admin) {
         this.admin = admin;
         if (admin != null) {
@@ -112,5 +110,28 @@ public class Projet {
         }
     }
 
-
+    public Projet(ProjetDTO projetDTO) {
+        setId(projetDTO.getId());
+        setNomCourt(projetDTO.getNomCourt());
+        setNomLong(projetDTO.getNomLong());
+        setDescription(projetDTO.getDescription());
+        setTheme(projetDTO.getTheme());
+        setType(projetDTO.getType());
+        setEstPublic(projetDTO.isEstPublic());
+        setLicense(projetDTO.getLicense());
+        setStatutProjet(projetDTO.getStatutProjet());
+        setDateAcceptation(projetDTO.getDateAcceptation());
+        setDateRejet(projetDTO.getDateRejet());
+        setDateCreation(projetDTO.getDateCreation());
+        setDateCloture(projetDTO.getDateCloture());
+        setMembres(new HashSet<>());
+        setAdmins(new HashSet<>());
+        setTaches(new HashSet<>());
+        setReunions(new HashSet<>());
+        setDepotDocuments(new HashSet<>());
+        setListesDiffusion(new HashSet<>());
+        setGroupe(null);
+        setSallesDiscussion(new HashSet<>());
+        setDemandeursEnAttente(new HashSet<>());
+    }
 }
