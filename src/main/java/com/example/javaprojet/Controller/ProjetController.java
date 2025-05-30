@@ -95,6 +95,8 @@ public class ProjetController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
+
+    // TODO : test this
     @Secured({"ROLE_ADMIN_PROJET"})
     @GetMapping("/{projetId}/demandes")
     public ResponseEntity<List<Utilisateur>> afficherListDemandeRejoindreProjet(

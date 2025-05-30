@@ -1,12 +1,12 @@
 package com.example.javaprojet.services;
 
+import com.example.javaprojet.dto.UtilisateurDTO;
 import com.example.javaprojet.entity.*;
 import com.example.javaprojet.model.RoleType;
 import com.example.javaprojet.model.StatutProjet;
 import com.example.javaprojet.repo.*;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
-import org.apache.catalina.User;
 import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.DefaultAuthenticationEventPublisher;
@@ -237,4 +237,11 @@ public class UtilisateurService {
         return utilisateurRepesitory.findById(id);
     }
 
+    public Utilisateur getUtilisateurByEmail(String email) {
+        return utilisateurRepesitory.getDistinctByEmail(email).orElse(null);
+    }
+
+    public boolean hasCalendar(Long utilisateurId, Long calendarId) {
+        return utilisateurRepesitory.hasCalendar(utilisateurId, calendarId);
+    }
 }

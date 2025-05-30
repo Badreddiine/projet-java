@@ -2,12 +2,16 @@ package com.example.javaprojet.Controller;
 
 import com.example.javaprojet.dto.CalendrierDTO;
 import com.example.javaprojet.entity.Calendrier;
+import com.example.javaprojet.entity.Utilisateur;
 import com.example.javaprojet.services.CalendrierService;
+import com.example.javaprojet.services.UtilisateurService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.List;
 import java.util.Optional;
 
@@ -16,49 +20,64 @@ import java.util.Optional;
 public class CalendrierController {
 
     private final CalendrierService calendrierService;
+    private final UtilisateurService utilisateurService;
 
     @Autowired
-    public CalendrierController(CalendrierService calendrierService) {
+    public CalendrierController(CalendrierService calendrierService, UtilisateurService utilisateurService) {
         this.calendrierService = calendrierService;
+        this.utilisateurService = utilisateurService;
     }
 
     @PostMapping
-    public ResponseEntity<Calendrier> createCalendrier(@RequestBody Calendrier calendrier) {
-        return new ResponseEntity<>(calendrierService.create(calendrier), HttpStatus.CREATED);
+    public ResponseEntity<CalendrierDTO> createCalendrier(Principal principal, @RequestBody @Valid CalendrierDTO calendrierDTO) {
+        Utilisateur utilisateur = utilisateurService.getUtilisateurByEmail(principal.getName());
+        if (utilisateur != null) {
+            Calendrier calendrier = calendrierService.create(calendrierDTO, utilisateur);
+            return new ResponseEntity<>(new CalendrierDTO(calendrier), HttpStatus.CREATED);
+        } else {
+            // This condition is unaccessible
+            return new ResponseEntity<>(calendrierDTO, HttpStatus.BAD_REQUEST);
+        }
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<CalendrierDTO> getCalendrierById(@PathVariable Long id) {
-        Optional<Calendrier> calendrier = calendrierService.findById(id);
-        if (calendrier.isPresent()) {
-            return new ResponseEntity<>(new CalendrierDTO(calendrier.get()), HttpStatus.OK);
+        Calendrier calendrier = calendrierService.findById(id);
+        if (calendrier != null) {
+            return new ResponseEntity<>(new CalendrierDTO(calendrier), HttpStatus.OK);
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
 
-    @GetMapping
-    public ResponseEntity<List<Calendrier>> getAllCalendriers() {
-        List<Calendrier> calendriers = (List<Calendrier>) calendrierService.findAll();
-        return new ResponseEntity<>(calendriers, HttpStatus.OK);
-    }
-
+    // TODO : Maybe this needs to change
     @PutMapping("/{id}")
-    public ResponseEntity<Calendrier> updateCalendrier(@PathVariable Long id, @RequestBody Calendrier calendrier) {
-        try {
-            Calendrier updated = calendrierService.update(id, calendrier);
-            return new ResponseEntity<>(updated, HttpStatus.OK);
-        } catch (RuntimeException e) {
+    public ResponseEntity<CalendrierDTO> updateCalendrier(Principal principal, @RequestBody CalendrierDTO calendrierDTO) {
+        Utilisateur utilisateur = utilisateurService.getUtilisateurByEmail(principal.getName());
+        if (calendrierDTO.getId() == null) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+        boolean hasCalendar = utilisateurService.hasCalendar(utilisateur.getId(), calendrierDTO.getId());
+        if (hasCalendar) {
+            Calendrier calendrier = calendrierService.update(calendrierDTO);
+            if (calendrier != null) {
+                return new ResponseEntity<>(new CalendrierDTO(calendrier), HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+        } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteCalendrier(@PathVariable Long id) {
-        try {
+    public ResponseEntity<Void> deleteCalendrier(Principal principal, @PathVariable Long id) {
+        Utilisateur utilisateur = utilisateurService.getUtilisateurByEmail(principal.getName());
+        if (utilisateurService.hasCalendar(utilisateur.getId(), id)) {
             calendrierService.delete(id);
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        } catch (RuntimeException e) {
+            return ResponseEntity.ok().build();
+        } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }

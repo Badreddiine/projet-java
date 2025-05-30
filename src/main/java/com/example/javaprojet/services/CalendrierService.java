@@ -20,7 +20,9 @@ public class CalendrierService {
     }
 
 
-    public Calendrier create(Calendrier calendrier) {
+    public Calendrier create(CalendrierDTO calendrierDTO, Utilisateur utilisateur) {
+        Calendrier calendrier = new Calendrier(calendrierDTO);
+        calendrier.setProprietaire(utilisateur);
         return calendrierRepository.save(calendrier);
     }
 
@@ -37,10 +39,21 @@ public class CalendrierService {
                 .orElseThrow(() -> new RuntimeException("Calendrier non trouvé avec id " + id));
     }
 
+    // TODO : Has to rethink this design later
+    public Calendrier update(CalendrierDTO updatedDTO) {
+        return calendrierRepository.findById(updatedDTO.getId())
+                .map(existing -> {
+                    existing.setNom(updatedDTO.getNom());
+                    existing.setEstPartage(updatedDTO.isEstPartage());
+                    return calendrierRepository.save(existing);
+                })
+                .orElseThrow(null);
+    }
+
 
     @Transactional(readOnly = true)
-    public Optional<Calendrier> findById(Long id) {
-        return calendrierRepository.findById(id);
+    public Calendrier findById(Long id) {
+        return calendrierRepository.findById(id).orElse(null);
     }
 
     @Transactional(readOnly = true)
@@ -50,9 +63,6 @@ public class CalendrierService {
 
 
     public void delete(Long id) {
-        if (!calendrierRepository.existsById(id)) {
-            throw new RuntimeException("Impossible de supprimer, calendrier non trouvé avec id " + id);
-        }
         calendrierRepository.deleteById(id);
     }
 }
