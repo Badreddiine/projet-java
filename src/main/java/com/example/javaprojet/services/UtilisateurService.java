@@ -1,15 +1,16 @@
 package com.example.javaprojet.services;
 
-import com.example.javaprojet.dto.UtilisateurDTO;
 import com.example.javaprojet.entity.*;
-import com.example.javaprojet.model.RoleType;
-import com.example.javaprojet.model.StatutProjet;
+import com.example.javaprojet.enums.RoleSecondaire;
+import com.example.javaprojet.enums.RoleType;
+import com.example.javaprojet.enums.StatutProjet;
 import com.example.javaprojet.repo.*;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.DefaultAuthenticationEventPublisher;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 
@@ -36,10 +37,16 @@ public class UtilisateurService {
     @Autowired
     private DefaultAuthenticationEventPublisher authenticationEventPublisher;
 
+    @Autowired
+    PasswordEncoder passwordEncoder;
+
     public void creeCompte(Utilisateur utilisateur) throws Exception {
         List<Utilisateur> listExist = utilisateurRepesitory.findByEmail(utilisateur.getEmail());
         if (listExist.isEmpty()) {
             utilisateur.setRole(RoleType.GUEST);
+            // TODO : This should change later
+            utilisateur.setRoleSecondaire(RoleSecondaire.GUESS);
+            utilisateur.setMotDePasse(passwordEncoder.encode(utilisateur.getMotDePasse()));
             utilisateurRepesitory.save(utilisateur);
             System.out.println("Compte créé avec succès !");
         } else {

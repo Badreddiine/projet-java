@@ -1,7 +1,7 @@
 package com.example.javaprojet.entity;
 import java.util.*;
-import com.example.javaprojet.model.RoleType;
-import com.example.javaprojet.model.RoleSecondaire;
+import com.example.javaprojet.enums.RoleType;
+import com.example.javaprojet.enums.RoleSecondaire;
 import jakarta.persistence.*;
 import lombok.Data;
 import net.minidev.json.annotate.JsonIgnore;

@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import com.example.javaprojet.model.RoleType;
+import com.example.javaprojet.enums.RoleType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -12,8 +12,8 @@ import com.example.javaprojet.entity.Groupe;
 import com.example.javaprojet.entity.Projet;
 import com.example.javaprojet.entity.ProjetRole;
 import com.example.javaprojet.entity.Utilisateur;
-import com.example.javaprojet.model.RoleSecondaire;
-import com.example.javaprojet.model.StatutProjet;
+import com.example.javaprojet.enums.RoleSecondaire;
+import com.example.javaprojet.enums.StatutProjet;
 import com.example.javaprojet.repo.GroupeRepesitory;
 import com.example.javaprojet.repo.ProjetRepesitory;
 import com.example.javaprojet.repo.ProjetRoleRepository;
@@ -221,11 +221,11 @@ public class ProjetService {
             throw new IllegalStateException("Aucune demande trouvée pour cet utilisateur");
         }
 
-        demandeur.setRoleSecondaire(RoleSecondaire.MEMBRE_PTOJET);
+        demandeur.setRoleSecondaire(RoleSecondaire.MEMBRE_PROJET);
         projet.getMembres().add(demandeur);
         projetRoleRepository.save( ProjetRole.builder()
                 .projet(projet)
-                .roleSecondaire(RoleSecondaire.MEMBRE_PTOJET)
+                .roleSecondaire(RoleSecondaire.MEMBRE_PROJET)
                 .utilisateur(demandeur).build()
         );
         projetRepesitory.save(projet);

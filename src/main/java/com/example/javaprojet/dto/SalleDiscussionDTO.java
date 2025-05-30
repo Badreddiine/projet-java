@@ -1,7 +1,7 @@
 package com.example.javaprojet.dto;
 
 
-import com.example.javaprojet.model.TypeSalle;
+import com.example.javaprojet.enums.TypeSalle;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

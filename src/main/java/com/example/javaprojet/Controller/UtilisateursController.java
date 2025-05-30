@@ -2,7 +2,7 @@ package com.example.javaprojet.Controller;
 
 import com.example.javaprojet.entity.Projet;
 import com.example.javaprojet.entity.Utilisateur;
-import com.example.javaprojet.model.RoleType;
+import com.example.javaprojet.enums.RoleType;
 import com.example.javaprojet.services.UtilisateurService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

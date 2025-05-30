@@ -1,6 +1,6 @@
 package com.example.javaprojet.dto;
 
-import com.example.javaprojet.model.MessageType;
+import com.example.javaprojet.enums.MessageType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

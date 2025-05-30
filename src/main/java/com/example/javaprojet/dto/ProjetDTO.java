@@ -1,15 +1,11 @@
 package com.example.javaprojet.dto;
 
 import com.example.javaprojet.entity.Projet;
-import com.example.javaprojet.entity.Utilisateur;
-import com.example.javaprojet.model.StatutProjet;
-import jakarta.persistence.*;
+import com.example.javaprojet.enums.StatutProjet;
 import lombok.Data;
-import net.minidev.json.annotate.JsonIgnore;
 
 import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
+
 @Data
 public class ProjetDTO {
     private Long id;

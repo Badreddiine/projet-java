@@ -1,7 +1,6 @@
 package com.example.javaprojet.entity;
 import com.example.javaprojet.dto.ProjetDTO;
-import com.example.javaprojet.model.RoleSecondaire;
-import com.example.javaprojet.model.StatutProjet;
+import com.example.javaprojet.enums.StatutProjet;
 import jakarta.persistence.*;
 import lombok.*;
 import net.minidev.json.annotate.JsonIgnore;

@@ -2,14 +2,13 @@ package com.example.javaprojet.repo;
 
 import com.example.javaprojet.entity.SalleDiscussion;
 import com.example.javaprojet.entity.Utilisateur;
-import com.example.javaprojet.model.TypeSalle;
+import com.example.javaprojet.enums.TypeSalle;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.Optional;
 
 @Repository
 public interface SalleDiscussionRepository extends JpaRepository<SalleDiscussion, Long> {

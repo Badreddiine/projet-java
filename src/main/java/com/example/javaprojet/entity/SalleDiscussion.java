@@ -2,7 +2,7 @@ package com.example.javaprojet.entity;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
-import com.example.javaprojet.model.TypeSalle;
+import com.example.javaprojet.enums.TypeSalle;
 import jakarta.persistence.*;
 import lombok.*;
 import net.minidev.json.annotate.JsonIgnore;

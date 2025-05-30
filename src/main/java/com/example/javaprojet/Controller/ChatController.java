@@ -4,7 +4,7 @@ import com.example.javaprojet.entity.Message;
 import com.example.javaprojet.entity.SalleDiscussion;
 import com.example.javaprojet.entity.Utilisateur;
 import com.example.javaprojet.MAPPERS.MessageMapper;
-import com.example.javaprojet.model.MessageType;
+import com.example.javaprojet.enums.MessageType;
 import com.example.javaprojet.services.MessageService;
 import com.example.javaprojet.services.SalleDiscussionService;
 import com.example.javaprojet.services.UtilisateurService;
@@ -19,9 +19,7 @@ import org.springframework.stereotype.Controller;
 
 import java.security.Principal;
 import java.util.Date;
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Controller
 @RequiredArgsConstructor

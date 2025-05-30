@@ -1,7 +1,7 @@
 package com.example.javaprojet.entity;
 
-import com.example.javaprojet.model.RoleSecondaire;
-import com.example.javaprojet.model.RoleType;
+import com.example.javaprojet.enums.RoleSecondaire;
+import com.example.javaprojet.enums.RoleType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

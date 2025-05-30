@@ -1,5 +1,5 @@
 package com.example.javaprojet.entity;
-import com.example.javaprojet.model.MessageType;
+import com.example.javaprojet.enums.MessageType;
 import jakarta.persistence.*;
 import lombok.*;
 import net.minidev.json.annotate.JsonIgnore;

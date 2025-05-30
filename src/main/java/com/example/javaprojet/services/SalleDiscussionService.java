@@ -4,7 +4,7 @@ import com.example.javaprojet.entity.Groupe;
 import com.example.javaprojet.entity.Projet;
 import com.example.javaprojet.entity.SalleDiscussion;
 import com.example.javaprojet.entity.Utilisateur;
-import com.example.javaprojet.model.TypeSalle;
+import com.example.javaprojet.enums.TypeSalle;
 import com.example.javaprojet.repo.SalleDiscussionRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

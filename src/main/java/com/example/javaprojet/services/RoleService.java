@@ -1,7 +1,7 @@
 package com.example.javaprojet.services;
 import com.example.javaprojet.entity.Projet;
 import com.example.javaprojet.entity.Utilisateur;
-import com.example.javaprojet.model.RoleType;
+import com.example.javaprojet.enums.RoleType;
 import com.example.javaprojet.repo.ProjetRoleRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;

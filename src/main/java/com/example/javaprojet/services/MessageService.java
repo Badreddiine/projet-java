@@ -3,7 +3,7 @@ package com.example.javaprojet.services;
 import com.example.javaprojet.entity.Message;
 import com.example.javaprojet.entity.SalleDiscussion;
 import com.example.javaprojet.entity.Utilisateur;
-import com.example.javaprojet.model.MessageType;
+import com.example.javaprojet.enums.MessageType;
 import com.example.javaprojet.repo.MessageRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
