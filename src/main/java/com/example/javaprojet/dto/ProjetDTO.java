@@ -3,10 +3,14 @@ package com.example.javaprojet.dto;
 import com.example.javaprojet.entity.Projet;
 import com.example.javaprojet.enums.StatutProjet;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.Date;
 
 @Data
+@Getter
+@Setter
 public class ProjetDTO {
     private Long id;
     private String nomCourt;

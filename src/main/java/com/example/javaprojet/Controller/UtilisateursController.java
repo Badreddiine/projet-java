@@ -1,9 +1,10 @@
 package com.example.javaprojet.Controller;
 
+import com.example.javaprojet.dto.UtilisateurDTO;
 import com.example.javaprojet.entity.Projet;
-import com.example.javaprojet.entity.Utilisateur;
 import com.example.javaprojet.enums.RoleType;
 import com.example.javaprojet.services.UtilisateurService;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,8 +17,6 @@ public class UtilisateursController {
 
     @Autowired
     private UtilisateurService utilisateurService;
-
-
 
     @PostMapping("/connexion")
     public ResponseEntity<String> seConnecter(@RequestParam String email, @RequestParam String motDePasse) {
@@ -36,15 +35,18 @@ public class UtilisateursController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<String> modifierProfil(@PathVariable Long id, @RequestBody Utilisateur utilisateurModifie) {
-        utilisateurService.modifierProfil(id, utilisateurModifie);
-        return ResponseEntity.ok("Profil mis à jour avec succès.");
+    public ResponseEntity<String> modifierProfil(@PathVariable Long id, @RequestBody UtilisateurDTO utilisateurModifie) {
+        try {
+            utilisateurService.modifierProfil(id, utilisateurModifie);
+            return ResponseEntity.ok("Profil mis à jour avec succès.");
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
-
     @GetMapping("/{id}")
-    public ResponseEntity<Utilisateur> getUtilisateur(@PathVariable Long id) {
-        Utilisateur utilisateur = utilisateurService.getUtilisateurById(id);
+    public ResponseEntity<UtilisateurDTO> getUtilisateur(@PathVariable Long id) {
+        UtilisateurDTO utilisateur = utilisateurService.getUtilisateurById(id);
         return utilisateur != null
                 ? ResponseEntity.ok(utilisateur)
                 : ResponseEntity.notFound().build();
@@ -57,19 +59,32 @@ public class UtilisateursController {
 
     @PostMapping("/{id}/projets")
     public ResponseEntity<String> demanderCreationProjet(@RequestBody Projet projet) {
-        utilisateurService.demanderCreationProjet(projet);
-        return ResponseEntity.ok("Demande de création de projet envoyée.");
+        try {
+            utilisateurService.demanderCreationProjet(projet);
+            return ResponseEntity.ok("Demande de création de projet envoyée.");
+        } catch (IllegalArgumentException | EntityNotFoundException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(409).body(e.getMessage());
+        }
     }
 
     @PostMapping("/{userId}/rejoindre-projet/{projetId}")
     public ResponseEntity<String> demanderRejoindreProjet(@PathVariable Long userId, @PathVariable Long projetId) {
-        utilisateurService.demanderRejoindreProjet(projetId, userId);
-        return ResponseEntity.ok("Demande envoyée pour rejoindre le projet.");
+        try {
+            utilisateurService.demanderRejoindreProjet(projetId, userId);
+            return ResponseEntity.ok("Demande envoyée pour rejoindre le projet.");
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(409).body(e.getMessage());
+        }
     }
 
     @GetMapping("/chercher")
-    public ResponseEntity<List<Utilisateur>> chercherParNom(@RequestParam String nom) {
-        return ResponseEntity.ok(utilisateurService.findByNom(nom));
+    public ResponseEntity<List<UtilisateurDTO>> chercherParNom(@RequestParam String nom) {
+        List<UtilisateurDTO> utilisateurs = utilisateurService.findByNom(nom);
+        return ResponseEntity.ok(utilisateurs);
     }
 
     @PutMapping("/{id}/changer-role")
@@ -86,5 +101,33 @@ public class UtilisateursController {
         return deleted
                 ? ResponseEntity.ok("Compte supprimé.")
                 : ResponseEntity.status(404).body("Utilisateur non trouvé.");
+    }
+
+    @GetMapping("/{projetId}/membres")
+    public ResponseEntity<List<UtilisateurDTO>> getMembresDuProjet(@PathVariable Long projetId, @RequestParam Long utilisateurId) {
+        try {
+            List<UtilisateurDTO> membres = utilisateurService.getMembresDuProjet(projetId, utilisateurId);
+            return ResponseEntity.ok(membres);
+        } catch (SecurityException e) {
+            return ResponseEntity.status(403).build();
+        }
+    }
+
+    @PostMapping("/creer-compte")
+    public ResponseEntity<String> creerCompte(@RequestBody UtilisateurDTO utilisateurDTO) {
+        try {
+            utilisateurService.creeCompte(utilisateurDTO);
+            return ResponseEntity.ok("Compte créé avec succès !");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/email/{email}")
+    public ResponseEntity<UtilisateurDTO> getUtilisateurByEmail(@PathVariable String email) {
+        UtilisateurDTO utilisateur = utilisateurService.getUtilisateurByEmail(email);
+        return utilisateur != null
+                ? ResponseEntity.ok(utilisateur)
+                : ResponseEntity.notFound().build();
     }
 }

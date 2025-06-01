@@ -1,4 +1,6 @@
 package com.example.javaprojet.Controller;
+import com.example.javaprojet.dto.SalleDiscussionDTO;
+import com.example.javaprojet.dto.UtilisateurDTO;
 import com.example.javaprojet.entity.Message;
 import com.example.javaprojet.entity.SalleDiscussion;
 import com.example.javaprojet.entity.Utilisateur;
@@ -46,7 +48,8 @@ public class MessageController {
 
         return salleDiscussionService.getSalleById(salleId)
                 .map(salle -> {
-                    Message message = messageService.creerSystemMessage(contenu, salle);
+                    SalleDiscussion sd = new SalleDiscussion(salle);
+                    Message message = messageService.creerSystemMessage(contenu, sd);
                     return ResponseEntity.status(HttpStatus.CREATED).body(message);
                 })
                 .orElse(ResponseEntity.notFound().build());
@@ -57,16 +60,18 @@ public class MessageController {
         Long salleId = Long.valueOf(payload.get("salleId").toString());
         Long userId = Long.valueOf(payload.get("userId").toString());
 
-        SalleDiscussion salle = salleDiscussionService.getSalleById(salleId)
+        SalleDiscussionDTO salle = salleDiscussionService.getSalleById(salleId)
                 .orElse(null);
-        Utilisateur utilisateur = utilisateurService.findById(userId)
+        UtilisateurDTO utilisateur = utilisateurService.findById(userId)
                 .orElse(null);
 
         if (salle == null || utilisateur == null) {
             return ResponseEntity.notFound().build();
         }
+        Utilisateur uti =new Utilisateur(utilisateur);
+        SalleDiscussion sd = new SalleDiscussion(salle);
 
-        Message message = messageService.creerUserJoinMessage(utilisateur, salle);
+        Message message = messageService.creerUserJoinMessage(uti, sd);
         return ResponseEntity.status(HttpStatus.CREATED).body(message);
     }
 
@@ -75,14 +80,15 @@ public class MessageController {
         Long salleId = Long.valueOf(payload.get("salleId").toString());
         Long userId = Long.valueOf(payload.get("userId").toString());
 
-        SalleDiscussion salle = salleDiscussionService.getSalleById(salleId)
+        SalleDiscussionDTO salle = salleDiscussionService.getSalleById(salleId)
                 .orElse(null);
-        Utilisateur utilisateur = utilisateurService.findById(userId)
+        UtilisateurDTO utilisateur = utilisateurService.findById(userId)
                 .orElse(null);
 
         if (salle == null || utilisateur == null) {
             return ResponseEntity.notFound().build();
         }
+
 
         Message message = messageService.creerUserLeaveMessage(utilisateur, salle);
         return ResponseEntity.status(HttpStatus.CREATED).body(message);

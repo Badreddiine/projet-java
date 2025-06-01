@@ -3,6 +3,7 @@ package com.example.javaprojet.Controller;
 import com.example.javaprojet.entity.Projet;
 import com.example.javaprojet.entity.Utilisateur;
 import com.example.javaprojet.services.ProjetService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
@@ -16,11 +17,12 @@ public class ProjetController {
 
     @Autowired
     private ProjetService projetService;
+
     @Secured("ROLE_ADMIN")
     @PostMapping("/{projetId}/accepter")
     public ResponseEntity<String> accepterProjet(
-            @PathVariable Long projetId,
-            @RequestParam Long idUserConnecter) {
+            @PathVariable @Valid Long projetId,
+            @RequestParam @Valid Long idUserConnecter) {
         try {
             projetService.accepterProjet(projetId, idUserConnecter);
             return ResponseEntity.ok("Projet accepté avec succès");
@@ -42,7 +44,6 @@ public class ProjetController {
     }
 
     @Secured({"ROLE_ADMIN","ROLE_ADMIN_PROJET"})
-
     @DeleteMapping("/{projetId}")
     public ResponseEntity<String> supprimerProjet(
             @PathVariable Long projetId,

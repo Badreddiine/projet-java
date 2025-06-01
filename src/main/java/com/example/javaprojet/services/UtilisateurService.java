@@ -1,5 +1,7 @@
 package com.example.javaprojet.services;
 
+import com.example.javaprojet.dto.ProjetDTO;
+import com.example.javaprojet.dto.UtilisateurDTO;
 import com.example.javaprojet.entity.*;
 import com.example.javaprojet.enums.RoleSecondaire;
 import com.example.javaprojet.enums.RoleType;
@@ -13,15 +15,14 @@ import org.springframework.security.authentication.DefaultAuthenticationEventPub
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.Scanner;
+import java.util.stream.Collectors;
 
 @Service
 public class UtilisateurService {
-    Scanner scanner = new Scanner(System.in);
 
     @Autowired
     UtilisateurRepesitory utilisateurRepesitory;
@@ -40,13 +41,17 @@ public class UtilisateurService {
     @Autowired
     PasswordEncoder passwordEncoder;
 
-    public void creeCompte(Utilisateur utilisateur) throws Exception {
-        List<Utilisateur> listExist = utilisateurRepesitory.findByEmail(utilisateur.getEmail());
+    public void creeCompte(UtilisateurDTO utilisateurDTO) throws Exception {
+        List<Utilisateur> listExist = utilisateurRepesitory.findByEmail(utilisateurDTO.getEmail());
         if (listExist.isEmpty()) {
+            Utilisateur utilisateur = convertToEntity(utilisateurDTO);
             utilisateur.setRole(RoleType.GUEST);
             // TODO : This should change later
             utilisateur.setRoleSecondaire(RoleSecondaire.GUESS);
-            utilisateur.setMotDePasse(passwordEncoder.encode(utilisateur.getMotDePasse()));
+            if (utilisateurDTO.hasPassword()) {
+                utilisateur.setMotDePasse(passwordEncoder.encode(utilisateurDTO.getMotDePasse()));
+            }
+
             utilisateurRepesitory.save(utilisateur);
             System.out.println("Compte créé avec succès !");
         } else {
@@ -94,22 +99,28 @@ public class UtilisateurService {
     }
 
     @Transactional
-    public void modifierProfil(Long idUser, Utilisateur utilisateurModifie) {
+    public void modifierProfil(Long idUser, UtilisateurDTO utilisateurModifieDTO) {
         Optional<Utilisateur> userExist = utilisateurRepesitory.findById(idUser);
         if (userExist.isPresent()) {
             Utilisateur user = userExist.get();
 
-            if (!user.getEmail().equals(utilisateurModifie.getEmail()) &&
-                    !utilisateurRepesitory.findByEmail(utilisateurModifie.getEmail()).isEmpty()) {
+            if (!user.getEmail().equals(utilisateurModifieDTO.getEmail()) &&
+                    !utilisateurRepesitory.findByEmail(utilisateurModifieDTO.getEmail()).isEmpty()) {
                 throw new RuntimeException("Cet email est deja utilise par un autre utilisateur.");
             }
 
-            user.setNom(utilisateurModifie.getNom());
-            user.setPrenom(utilisateurModifie.getPrenom());
-            user.setEmail(utilisateurModifie.getEmail());
+            user.setNom(utilisateurModifieDTO.getNom());
+            user.setPrenom(utilisateurModifieDTO.getPrenom());
+            user.setEmail(utilisateurModifieDTO.getEmail());
 
-            if (utilisateurModifie.getMotDePasse() != null && !utilisateurModifie.getMotDePasse().isEmpty()) {
-                user.setMotDePasse(utilisateurModifie.getMotDePasse());
+            // Handle password update if provided
+            if (utilisateurModifieDTO.hasPassword()) {
+                user.setMotDePasse(passwordEncoder.encode(utilisateurModifieDTO.getMotDePasse()));
+            }
+
+            // Update other fields if needed
+            if (utilisateurModifieDTO.getAvatar() != null) {
+                user.setAvatar(utilisateurModifieDTO.getAvatar());
             }
 
             utilisateurRepesitory.save(user);
@@ -130,12 +141,14 @@ public class UtilisateurService {
         }
     }
 
-    public List<Utilisateur> getMembresDuProjet(Long projetId, Long utilisateurId) {
+    public List<UtilisateurDTO> getMembresDuProjet(Long projetId, Long utilisateurId) {
         List<Utilisateur> membres = projetRepesitory.findMembresIfUserHasAccess(projetId, utilisateurId);
         if (membres.isEmpty()) {
             throw new SecurityException("Accès refusé ou projet inexistant");
         }
-        return membres;
+        return membres.stream()
+                .map(UtilisateurDTO::new)
+                .collect(Collectors.toList());
     }
 
     @Transactional
@@ -168,8 +181,9 @@ public class UtilisateurService {
         }
     }
 
-    public Utilisateur getUtilisateurById(Long id) {
-        return utilisateurRepesitory.findById(id).orElse(null);
+    public UtilisateurDTO getUtilisateurById(Long id) {
+        Optional<Utilisateur> utilisateur = utilisateurRepesitory.findById(id);
+        return utilisateur.map(UtilisateurDTO::new).orElse(null);
     }
 
     @Transactional
@@ -192,19 +206,24 @@ public class UtilisateurService {
     }
 
     @Transactional
-    public Utilisateur save(Utilisateur utilisateur) {
-        return utilisateurRepesitory.save(utilisateur);
+    public UtilisateurDTO save(UtilisateurDTO utilisateurDTO) {
+        Utilisateur utilisateur = convertToEntity(utilisateurDTO);
+        Utilisateur saved = utilisateurRepesitory.save(utilisateur);
+        return new UtilisateurDTO(saved);
     }
 
-    public List<Utilisateur> findByNom(String nom) {
-        return utilisateurRepesitory.findByNomContainingIgnoreCase(nom);
+    public List<UtilisateurDTO> findByNom(String nom) {
+        List<Utilisateur> utilisateurs = utilisateurRepesitory.findByNomContainingIgnoreCase(nom);
+        return utilisateurs.stream()
+                .map(UtilisateurDTO::new)
+                .collect(Collectors.toList());
     }
 
     @Transactional
     public boolean seDeconnecter(Long utilisateurId) {
-        Utilisateur utilisateur = getUtilisateurById(utilisateurId);
-        if (utilisateur != null) {
-            setConnecte(utilisateur, false);
+        Optional<Utilisateur> utilisateurOpt = utilisateurRepesitory.findById(utilisateurId);
+        if (utilisateurOpt.isPresent()) {
+            setConnecte(utilisateurOpt.get(), false);
             return true;
         }
         return false;
@@ -221,8 +240,9 @@ public class UtilisateurService {
     }
 
     public List<Projet> getProjetsByUtilisateur(Long utilisateurId) {
-        Utilisateur utilisateur = getUtilisateurById(utilisateurId);
-        if (utilisateur != null) {
+        Optional<Utilisateur> utilisateurOpt = utilisateurRepesitory.findById(utilisateurId);
+        if (utilisateurOpt.isPresent()) {
+            Utilisateur utilisateur = utilisateurOpt.get();
             Hibernate.initialize(utilisateur.getProjets());
             return (List<Projet>) utilisateur.getProjets();
         }
@@ -231,24 +251,44 @@ public class UtilisateurService {
 
     @Transactional
     public boolean changerRole(Long utilisateurId, RoleType nouveauRole) {
-        Utilisateur utilisateur = getUtilisateurById(utilisateurId);
-        if (utilisateur != null) {
+        Optional<Utilisateur> utilisateurOpt = utilisateurRepesitory.findById(utilisateurId);
+        if (utilisateurOpt.isPresent()) {
+            Utilisateur utilisateur = utilisateurOpt.get();
             utilisateur.setRole(nouveauRole);
-            save(utilisateur);
+            utilisateurRepesitory.save(utilisateur);
             return true;
         }
         return false;
     }
 
-        public Optional<Utilisateur> findById(Long id) {
-        return utilisateurRepesitory.findById(id);
+    public Optional<UtilisateurDTO> findById(Long id) {
+        Optional<Utilisateur> utilisateur = utilisateurRepesitory.findById(id);
+        return utilisateur.map(UtilisateurDTO::new);
     }
 
-    public Utilisateur getUtilisateurByEmail(String email) {
-        return utilisateurRepesitory.getDistinctByEmail(email).orElse(null);
+    public UtilisateurDTO getUtilisateurByEmail(String email) {
+        Optional<Utilisateur> utilisateur = utilisateurRepesitory.getDistinctByEmail(email);
+        return utilisateur.map(UtilisateurDTO::new).orElse(null);
     }
 
     public boolean hasCalendar(Long utilisateurId, Long calendarId) {
         return utilisateurRepesitory.hasCalendar(utilisateurId, calendarId);
+    }
+
+    // Helper method to convert DTO to Entity
+    private Utilisateur convertToEntity(UtilisateurDTO dto) {
+        Utilisateur utilisateur = new Utilisateur();
+        utilisateur.setId(dto.getId());
+        utilisateur.setNom(dto.getNom());
+        utilisateur.setPrenom(dto.getPrenom());
+        utilisateur.setEmail(dto.getEmail());
+        utilisateur.setAvatar(dto.getAvatar());
+        utilisateur.setEstEnLigne(dto.isEstEnLigne());
+        return utilisateur;
+    }
+
+    // Helper method to get entity by ID (for internal use)
+    private Utilisateur getUtilisateurEntityById(Long id) {
+        return utilisateurRepesitory.findById(id).orElse(null);
     }
 }

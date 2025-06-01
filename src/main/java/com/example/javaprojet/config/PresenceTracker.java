@@ -1,5 +1,6 @@
 package com.example.javaprojet.config;
 
+import com.example.javaprojet.dto.UtilisateurDTO;
 import com.example.javaprojet.entity.Utilisateur;
 import com.example.javaprojet.services.UtilisateurService;
 import lombok.extern.slf4j.Slf4j;
@@ -80,7 +81,7 @@ public class PresenceTracker {
      */
     private void updateUserStatus(Long userId, boolean connected) {
         try {
-            Utilisateur utilisateur = utilisateurService.getUtilisateurById(userId);
+            UtilisateurDTO utilisateur = utilisateurService.getUtilisateurById(userId);
             utilisateur.setConnecte(connected);
             utilisateur.setDerniereConnexion(new Date());
             utilisateurService.save(utilisateur);

@@ -1,6 +1,8 @@
 package com.example.javaprojet.services;
+import com.example.javaprojet.dto.UtilisateurDTO;
 import com.example.javaprojet.entity.ListeDiffusion;
 import com.example.javaprojet.entity.Ressource;
+import com.example.javaprojet.dto.ListDiffusionDTO;
 import com.example.javaprojet.entity.Utilisateur;
 import com.example.javaprojet.repo.ListeDiffusionRepository;
 import com.example.javaprojet.repo.RessourceRepository;
@@ -30,23 +32,32 @@ public class ListeDiffusionService {
         this.utilisateurRepository = utilisateurRepository;
         this.ressourceRepository = ressourceRepository;
     }
-    public ListeDiffusion create(ListeDiffusion liste) {
-        return listeDiffusionRepository.save(liste);
+
+    public ListDiffusionDTO create(ListDiffusionDTO liste) {
+        ListeDiffusion listeDiffusion = new ListeDiffusion(liste);
+        ListeDiffusion saved = listeDiffusionRepository.save(listeDiffusion);
+        return new ListDiffusionDTO(saved);
     }
 
     @Transactional(readOnly = true)
-    public Optional<ListeDiffusion> findById(Long id) {
-        return listeDiffusionRepository.findById(id);
+    public Optional<ListDiffusionDTO> findById(ListDiffusionDTO dto) {
+        long id = dto.getId();
+        Optional<ListeDiffusion> entity = listeDiffusionRepository.findById(id);
+        return entity.map(ListDiffusionDTO::new);
     }
 
     @Transactional(readOnly = true)
-    public List<ListeDiffusion> findAll() {
-        return listeDiffusionRepository.findAll();
+    public List<ListDiffusionDTO> findAll() {
+        List<ListeDiffusion> entities = listeDiffusionRepository.findAll();
+        return entities.stream()
+                .map(ListDiffusionDTO::new)
+                .collect(Collectors.toList());
     }
 
     //  UPDATE
-    public ListeDiffusion update(Long id, ListeDiffusion updated) {
-        return listeDiffusionRepository.findById(id)
+    public ListDiffusionDTO update(ListDiffusionDTO updated) {
+        long id = updated.getId();
+        ListeDiffusion updatedEntity = listeDiffusionRepository.findById(id)
                 .map(existing -> {
                     existing.setNom(updated.getNom());
                     existing.setType(updated.getType());
@@ -55,14 +66,16 @@ public class ListeDiffusionService {
                     existing.setDescription(updated.getDescription());
                     existing.setEstSysteme(updated.isEstSysteme());
                     existing.setProjet(updated.getProjet());
-                    existing.setAbonnes(updated.getAbonnes());
                     return listeDiffusionRepository.save(existing);
                 })
                 .orElseThrow(() -> new RuntimeException("Liste de diffusion non trouvée avec id " + id));
+
+        return new ListDiffusionDTO(updatedEntity);
     }
 
     //  DELETE
-    public void delete(Long id) {
+    public void delete(ListDiffusionDTO deleted) {
+        long id = deleted.getId();
         if (!listeDiffusionRepository.existsById(id)) {
             throw new RuntimeException("Liste non trouvée avec id " + id);
         }
@@ -71,10 +84,14 @@ public class ListeDiffusionService {
 
     // Liste des abonnés
     @Transactional(readOnly = true)
-    public Set<Utilisateur> getAbonnes(Long listeId) {
+    public Set<UtilisateurDTO> getAbonnes(ListDiffusionDTO listes) {
+        long listeId = listes.getId();
         ListeDiffusion liste = listeDiffusionRepository.findById(listeId)
                 .orElseThrow(() -> new RuntimeException("Liste non trouvée"));
-        return liste.getAbonnes();
+
+        return liste.getAbonnes().stream()
+                .map(UtilisateurDTO::new) // Assuming UtilisateurDTO has a constructor that takes Utilisateur
+                .collect(Collectors.toSet());
     }
 
     @Transactional(readOnly = true)
@@ -85,4 +102,3 @@ public class ListeDiffusionService {
                 .collect(Collectors.toList());
     }
 }
-

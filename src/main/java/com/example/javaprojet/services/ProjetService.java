@@ -56,9 +56,6 @@ public class ProjetService {
      */
     @Transactional
     public void accepterProjet(Long idProjet, Long idUserConnecter) {
-        if (idProjet == null || idUserConnecter == null) {
-            throw new IllegalArgumentException("Les IDs ne peuvent pas être null");
-        }
 
         Projet projet = projetRepesitory.findById(idProjet)
                 .orElseThrow(() -> new EntityNotFoundException(ERREUR_PROJET_NON_TROUVE));
@@ -70,11 +67,8 @@ public class ProjetService {
             throw new IllegalStateException(ERREUR_ADMIN);
         }
 
-        if (StatutProjet.REFUSER.equals(projet.getStatutProjet())) {
+        if (!StatutProjet.EN_ATTENTE.equals(projet.getStatutProjet())) {
             throw new IllegalStateException(ERREUR_PROJET_DEJA_REFUSE);
-        }
-        if (StatutProjet.ACCEPTER.equals(projet.getStatutProjet())) {
-            throw new IllegalStateException(ERREUR_PROJET_DEJA_ACCEPTE);
         }
 
         projet.setStatutProjet(StatutProjet.ACCEPTER);

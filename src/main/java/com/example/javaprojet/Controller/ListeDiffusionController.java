@@ -1,7 +1,8 @@
 package com.example.javaprojet.Controller;
-import com.example.javaprojet.entity.ListeDiffusion;
+
+import com.example.javaprojet.dto.ListDiffusionDTO;
+import com.example.javaprojet.dto.UtilisateurDTO;
 import com.example.javaprojet.entity.Ressource;
-import com.example.javaprojet.entity.Utilisateur;
 import com.example.javaprojet.services.ListeDiffusionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -10,6 +11,7 @@ import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 @RestController
@@ -22,40 +24,45 @@ public class ListeDiffusionController {
     public ListeDiffusionController(ListeDiffusionService listeDiffusionService) {
         this.listeDiffusionService = listeDiffusionService;
     }
-    @Secured({"ROLE_ADMIN_PROJET"})
+
+    @Secured("ROLE_ADMIN_PROJET")
     @PostMapping
-    public ResponseEntity<ListeDiffusion> createListeDiffusion(@RequestBody ListeDiffusion liste) {
-        ListeDiffusion created = listeDiffusionService.create(liste);
+    public ResponseEntity<ListDiffusionDTO> createListeDiffusion(@RequestBody ListDiffusionDTO listeDTO) {
+        ListDiffusionDTO created = listeDiffusionService.create(listeDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ListeDiffusion> getListeDiffusionById(@PathVariable Long id) {
-        return listeDiffusionService.findById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<ListDiffusionDTO> getListeDiffusionById(@PathVariable Long id) {
+        // Create a DTO with just the ID to pass to the service
+        ListDiffusionDTO searchDTO = new ListDiffusionDTO(id);
+        Optional<ListDiffusionDTO> result = listeDiffusionService.findById(searchDTO);
+        return result.map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @GetMapping
-    public ResponseEntity<List<ListeDiffusion>> getAllListesDiffusion() {
-        List<ListeDiffusion> listes = listeDiffusionService.findAll();
+    public ResponseEntity<List<ListDiffusionDTO>> getAllListesDiffusion() {
+        List<ListDiffusionDTO> listes = listeDiffusionService.findAll();
         return ResponseEntity.ok(listes);
     }
-    @Secured({"ROLE_ADMIN_PROJET"})
-    @PutMapping("/{id}")
-    public ResponseEntity<ListeDiffusion> updateListeDiffusion(@PathVariable Long id, @RequestBody ListeDiffusion liste) {
+
+    @Secured("ROLE_ADMIN_PROJET")
+    @PutMapping
+    public ResponseEntity<ListDiffusionDTO> updateListeDiffusion(@RequestBody ListDiffusionDTO listeDTO) {
         try {
-            ListeDiffusion updated = listeDiffusionService.update(id, liste);
+            ListDiffusionDTO updated = listeDiffusionService.update(listeDTO);
             return ResponseEntity.ok(updated);
         } catch (RuntimeException e) {
             return ResponseEntity.notFound().build();
         }
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteListeDiffusion(@PathVariable Long id) {
+    @Secured("ROLE_ADMIN_PROJET")
+    @DeleteMapping
+    public ResponseEntity<Void> deleteListeDiffusion(@RequestBody ListDiffusionDTO listeDTO) {
         try {
-            listeDiffusionService.delete(id);
+            listeDiffusionService.delete(listeDTO);
             return ResponseEntity.ok().build();
         } catch (RuntimeException e) {
             return ResponseEntity.notFound().build();
@@ -63,9 +70,9 @@ public class ListeDiffusionController {
     }
 
     @GetMapping("/{id}/abonnes")
-    public ResponseEntity<Set<Utilisateur>> getAbonnes(@PathVariable Long id) {
+    public ResponseEntity<Set<UtilisateurDTO>> getAbonnes(@PathVariable Long id) {
         try {
-            Set<Utilisateur> abonnes = listeDiffusionService.getAbonnes(id);
+            Set<UtilisateurDTO> abonnes = listeDiffusionService.getAbonnes(new ListDiffusionDTO(id));
             return ResponseEntity.ok(abonnes);
         } catch (RuntimeException e) {
             return ResponseEntity.notFound().build();

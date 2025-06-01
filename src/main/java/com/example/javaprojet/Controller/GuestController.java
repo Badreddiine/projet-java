@@ -1,5 +1,6 @@
 package com.example.javaprojet.Controller;
 
+import com.example.javaprojet.dto.UtilisateurDTO;
 import com.example.javaprojet.entity.Projet;
 import com.example.javaprojet.entity.Utilisateur;
 import com.example.javaprojet.services.UtilisateurService;
@@ -26,7 +27,7 @@ public class GuestController {
     }
 
     @GetMapping("/chercher")
-    public ResponseEntity<List<Utilisateur>> chercherParNom(@RequestParam String nom) {
+    public ResponseEntity<List<UtilisateurDTO>> chercherParNom(@RequestParam String nom) {
         return ResponseEntity.ok(utilisateurService.findByNom(nom));
     }
 }

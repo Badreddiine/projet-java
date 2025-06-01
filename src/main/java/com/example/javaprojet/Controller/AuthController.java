@@ -43,7 +43,7 @@ public class AuthController {
         return ResponseEntity.ok().build();
     }
     @PostMapping("/inscription")
-    public ResponseEntity<String> creerCompte(@RequestBody Utilisateur utilisateur) {
+    public ResponseEntity<String> creerCompte(@RequestBody UtilisateurDTO utilisateur) {
         try {
             utilisateurService.creeCompte(utilisateur);
             return ResponseEntity.ok("Compte créé avec succès !");
@@ -54,7 +54,8 @@ public class AuthController {
     }
 
     @GetMapping("/me")
-    public ResponseEntity<UtilisateurDTO> getCurrentUser() {
+    public ResponseEntity<UtilisateurDTO> getCurrentUser()
+    {
         return ResponseEntity.ok(authService.getCurrentUser());
     }
 }

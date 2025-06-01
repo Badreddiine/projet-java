@@ -1,11 +1,17 @@
 package com.example.javaprojet.services;
 
+import com.example.javaprojet.dto.SalleDiscussionDTO;
+import com.example.javaprojet.dto.UtilisateurDTO;
 import com.example.javaprojet.entity.Groupe;
 import com.example.javaprojet.entity.Projet;
 import com.example.javaprojet.entity.SalleDiscussion;
 import com.example.javaprojet.entity.Utilisateur;
 import com.example.javaprojet.enums.TypeSalle;
+import com.example.javaprojet.repo.GroupeRepesitory;
+import com.example.javaprojet.repo.ProjetRepesitory;
 import com.example.javaprojet.repo.SalleDiscussionRepository;
+import com.example.javaprojet.repo.UtilisateurRepesitory;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,15 +21,64 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class SalleDiscussionService {
 
     private final SalleDiscussionRepository salleDiscussionRepository;
+    private final UtilisateurRepesitory utilisateurRepository;
+    private final ProjetRepesitory projetRepository;
+    private final GroupeRepesitory groupeRepository;
 
-    public Optional<SalleDiscussion> getSalleById(Long id) {
-        return salleDiscussionRepository.findById(id);
+    // Fixed: Return SalleDiscussion entity instead of DTO
+    public Optional<SalleDiscussionDTO> getSalleById(Long id) {
+        return salleDiscussionRepository.findById(id)
+                .map(SalleDiscussionDTO::new);
+    }
+
+    @Transactional
+    public SalleDiscussion creerSalle(SalleDiscussionDTO salleDTO, Long createurId) {
+        Utilisateur createur = utilisateurRepository.findById(createurId)
+                .orElseThrow(() -> new RuntimeException("Créateur non trouvé"));
+
+        SalleDiscussion.SalleDiscussionBuilder builder = SalleDiscussion.builder()
+                .nom(salleDTO.getNom())
+                .description(salleDTO.getDescription())
+                .typeSalle(salleDTO.getTypeSalle())
+                .estPublique(salleDTO.isEstPublique())
+                .dateCreation(new Date())
+                .createur(createur);
+
+        // Handle different types of rooms
+        switch (salleDTO.getTypeSalle()) {
+            case GROUPE:
+                if (salleDTO.getIdGroupe() != null) {
+                    Groupe groupe = groupeRepository.findById(salleDTO.getIdGroupe())
+                            .orElseThrow(() -> new RuntimeException("Groupe non trouvé"));
+                    builder.groupe(groupe).membres(new HashSet<>(groupe.getMembres()));
+                }
+                break;
+            case PROJET:
+                if (salleDTO.getIdProjet() != null) {
+                    Projet projet = projetRepository.findById(salleDTO.getIdProjet())
+                            .orElseThrow(() -> new RuntimeException("Projet non trouvé"));
+                    builder.projet(projet).membres(new HashSet<>(projet.getMembres()));
+                }
+                break;
+            case PRIVEE:
+                Set<Utilisateur> membresPrives = new HashSet<>();
+                membresPrives.add(createur);
+                // Add logic to add the other user if specified
+                builder.membres(membresPrives).estPublique(false);
+                break;
+            case GENERALE:
+                builder.membres(new HashSet<>());
+                break;
+        }
+
+        return salleDiscussionRepository.save(builder.build());
     }
 
     @Transactional
@@ -100,7 +155,11 @@ public class SalleDiscussionService {
         return salleDiscussionRepository.save(salle);
     }
 
-    public List<SalleDiscussion> getSallesUtilisateur(Utilisateur utilisateur) {
+    // Fixed: Return List<SalleDiscussion> instead of List<SalleDiscussionDTO>
+    public List<SalleDiscussion> getSallesUtilisateur(UtilisateurDTO utilisateurDTO) {
+        Utilisateur utilisateur = utilisateurRepository.findById(utilisateurDTO.getId())
+                .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé"));
+
         return salleDiscussionRepository.findByMembresContaining(utilisateur);
     }
 
@@ -114,6 +173,28 @@ public class SalleDiscussionService {
 
     public List<SalleDiscussion> getSallesGroupe(Long groupeId) {
         return salleDiscussionRepository.findByGroupe_Id(groupeId);
+    }
+
+    @Transactional
+    public void ajouterMembre(Long salleId, Long utilisateurId) {
+        SalleDiscussion salle = salleDiscussionRepository.findById(salleId)
+                .orElseThrow(() -> new RuntimeException("Salle non trouvée"));
+        Utilisateur utilisateur = utilisateurRepository.findById(utilisateurId)
+                .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé"));
+
+        salle.getMembres().add(utilisateur);
+        salleDiscussionRepository.save(salle);
+    }
+
+    @Transactional
+    public void retirerMembre(Long salleId, Long utilisateurId) {
+        SalleDiscussion salle = salleDiscussionRepository.findById(salleId)
+                .orElseThrow(() -> new RuntimeException("Salle non trouvée"));
+        Utilisateur utilisateur = utilisateurRepository.findById(utilisateurId)
+                .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé"));
+
+        salle.getMembres().remove(utilisateur);
+        salleDiscussionRepository.save(salle);
     }
 
     @Transactional
@@ -133,4 +214,3 @@ public class SalleDiscussionService {
         salleDiscussionRepository.deleteById(salleId);
     }
 }
-

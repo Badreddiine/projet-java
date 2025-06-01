@@ -11,6 +11,8 @@ import java.util.Set;
 
 @Data
 @Entity
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 public class Projet {

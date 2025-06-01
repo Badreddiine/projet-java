@@ -1,5 +1,7 @@
 package com.example.javaprojet.services;
 
+import com.example.javaprojet.dto.SalleDiscussionDTO;
+import com.example.javaprojet.dto.UtilisateurDTO;
 import com.example.javaprojet.entity.Message;
 import com.example.javaprojet.entity.SalleDiscussion;
 import com.example.javaprojet.entity.Utilisateur;
@@ -66,13 +68,15 @@ public class MessageService {
     }
 
     @Transactional
-    public Message creerUserLeaveMessage(Utilisateur utilisateur, SalleDiscussion salle) {
+    public Message creerUserLeaveMessage(UtilisateurDTO utilisateur, SalleDiscussionDTO salle) {
+        SalleDiscussion salleDiscussion = new SalleDiscussion(salle);
+        Utilisateur uti=new Utilisateur(utilisateur);
         Message message = Message.builder()
                 .idExpediteur(utilisateur.getId())
-                .expediteur(utilisateur)
+                .expediteur(uti)
                 .contenu(utilisateur.getNom() + " a quitté la salle")
                 .dateEnvoi(new Date())
-                .salle(salle)
+                .salle(salleDiscussion)
                 .type(MessageType.LEAVE)
                 .estLu(false)
                 .build();

@@ -3,7 +3,11 @@ package com.example.javaprojet.MAPPERS;
 import com.example.javaprojet.dto.SalleDiscussionDTO;
 import com.example.javaprojet.entity.Message;
 import com.example.javaprojet.entity.SalleDiscussion;
+import com.example.javaprojet.repo.GroupeRepesitory;
 import com.example.javaprojet.repo.MessageRepository;
+import com.example.javaprojet.repo.ProjetRepesitory;
+import com.example.javaprojet.repo.UtilisateurRepesitory;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -18,6 +22,9 @@ public class SalleDiscussionMapper {
     private final UtilisateurMapper utilisateurMapper;
     private final MessageMapper messageMapper;
     private final MessageRepository messageRepository;
+    private final UtilisateurRepesitory utilisateurRepository;
+    private final ProjetRepesitory projetRepository;
+    private final GroupeRepesitory groupeRepository;
 
     public SalleDiscussionDTO toDTO(SalleDiscussion salle, Long utilisateurId) {
         if (salle == null) {
@@ -36,7 +43,7 @@ public class SalleDiscussionMapper {
 
         return SalleDiscussionDTO.builder()
                 .id(salle.getId())
-
+                .nom(salle.getNom())  // This was missing!
                 .description(salle.getDescription())
                 .typeSalle(salle.getTypeSalle())
                 .estPublique(salle.isEstPublique())
@@ -54,6 +61,41 @@ public class SalleDiscussionMapper {
                 .nombreMessagesNonLus((int) messagesNonLus)
                 .build();
     }
+
+    // Convert DTO to Entity (for creating new entities)
+    public SalleDiscussion toEntity(SalleDiscussionDTO dto) {
+        if (dto == null) {
+            return null;
+        }
+
+        SalleDiscussion.SalleDiscussionBuilder builder = SalleDiscussion.builder()
+                .id(dto.getId())
+                .nom(dto.getNom())
+                .description(dto.getDescription())
+                .typeSalle(dto.getTypeSalle())
+                .estPublique(dto.isEstPublique())
+                .dateCreation(dto.getDateCreation());
+
+        // Set related entities if IDs are provided
+        if (dto.getIdProjet() != null) {
+            projetRepository.findById(dto.getIdProjet())
+                    .ifPresent(builder::projet);
+        } else if (dto.getProjet() != null) {
+            builder.projet(dto.getProjet());
+        }
+
+        if (dto.getIdGroupe() != null) {
+            groupeRepository.findById(dto.getIdGroupe())
+                    .ifPresent(builder::groupe);
+        } else if (dto.getGroupe() != null) {
+            builder.groupe(dto.getGroupe());
+        }
+
+        if (dto.getIdCreateur() != null) {
+            utilisateurRepository.findById(dto.getIdCreateur())
+                    .ifPresent(builder::createur);
+        }
+
+        return builder.build();
+    }
 }
-
-

@@ -37,9 +37,16 @@ public class ListeDiffusion extends Ressource {
     private Set<Utilisateur> abonnes = new HashSet<>();
 
     public ListeDiffusion(ListDiffusionDTO listDiffusionDTO) {
+        setId(listDiffusionDTO.getId());
+        setType(listDiffusionDTO.getType());
+        setChemin(listDiffusionDTO.getChemin());
+        setNom(listDiffusionDTO.getNom());
+        setDescription(listDiffusionDTO.getDescription());
+        setEstSysteme(listDiffusionDTO.isEstSysteme());
         setDescription(listDiffusionDTO.getDescription());
         setEstSysteme(listDiffusionDTO.isEstSysteme());
         setProjet(listDiffusionDTO.getProjet());
+        setAbonnes(new HashSet<>());
         setAbonnes(new HashSet<>());
     }
 

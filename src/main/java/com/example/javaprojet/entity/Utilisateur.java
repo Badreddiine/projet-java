@@ -1,14 +1,20 @@
 package com.example.javaprojet.entity;
 import java.util.*;
+
+import com.example.javaprojet.dto.UtilisateurDTO;
 import com.example.javaprojet.enums.RoleType;
 import com.example.javaprojet.enums.RoleSecondaire;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import net.minidev.json.annotate.JsonIgnore;
 
 @Entity
 @Data
 @Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
+@NoArgsConstructor
+@AllArgsConstructor
 public class Utilisateur {
 
     @Id
@@ -106,6 +112,33 @@ public class Utilisateur {
                 '}';
     }
 
+    public Utilisateur(UtilisateurDTO dto) {
+        setId(dto.getId());
+        setIdentifiant(dto.getIdentifiant());
+        setNom(dto.getNom());
+        setPrenom(dto.getPrenom());
+        setEmail(dto.getEmail());
+        setMotDePasse(dto.getMotDePasse());
+        setPhotoProfile(dto.getPhotoProfile());
+        setAvatar(dto.getAvatar());
+        setActif(dto.isActif());
+        setEstConnecte(dto.isEstConnecte());
+        setEstEnLigne(dto.isEstEnLigne());
+        setDerniereConnexion(dto.getDerniereConnexion());
+        setRole(dto.getRole());
+        setRoleSecondaire(dto.getRoleSecondaire());
+        setDateInscription(dto.getDateInscription());
+        setProviderId(dto.getProviderId());
+        setProvider(dto.getProvider());
+        setRefreshToken(dto.getRefreshToken());
 
+        // Initialiser les collections vides
+        setGroupes(new HashSet<>());
+        setProjets(new HashSet<>());
+        setProjetsAdministres(new HashSet<>());
+        setMessagesEnvoyes(new ArrayList<>());
+        setMessagesRecus(new ArrayList<>());
+        setCalendriers(new HashSet<>());
+    }
 
 }

@@ -1,6 +1,7 @@
 package com.example.javaprojet.Controller;
 
 import com.example.javaprojet.dto.CalendrierDTO;
+import com.example.javaprojet.dto.UtilisateurDTO;
 import com.example.javaprojet.entity.Calendrier;
 import com.example.javaprojet.entity.Utilisateur;
 import com.example.javaprojet.services.CalendrierService;
@@ -28,11 +29,12 @@ public class CalendrierController {
         this.utilisateurService = utilisateurService;
     }
 
-    @PostMapping
+    @PostMapping("/")
     public ResponseEntity<CalendrierDTO> createCalendrier(Principal principal, @RequestBody @Valid CalendrierDTO calendrierDTO) {
-        Utilisateur utilisateur = utilisateurService.getUtilisateurByEmail(principal.getName());
+        UtilisateurDTO utilisateur = utilisateurService.getUtilisateurByEmail(principal.getName());
         if (utilisateur != null) {
-            Calendrier calendrier = calendrierService.create(calendrierDTO, utilisateur);
+            Utilisateur uti=new Utilisateur(utilisateur);
+            Calendrier calendrier = calendrierService.create(calendrierDTO, uti);
             return new ResponseEntity<>(new CalendrierDTO(calendrier), HttpStatus.CREATED);
         } else {
             // This condition is unaccessible
@@ -51,9 +53,9 @@ public class CalendrierController {
     }
 
     // TODO : Maybe this needs to change
-    @PutMapping("/{id}")
+    @PutMapping("/")
     public ResponseEntity<CalendrierDTO> updateCalendrier(Principal principal, @RequestBody CalendrierDTO calendrierDTO) {
-        Utilisateur utilisateur = utilisateurService.getUtilisateurByEmail(principal.getName());
+        UtilisateurDTO utilisateur = utilisateurService.getUtilisateurByEmail(principal.getName());
         if (calendrierDTO.getId() == null) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
@@ -73,7 +75,7 @@ public class CalendrierController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteCalendrier(Principal principal, @PathVariable Long id) {
-        Utilisateur utilisateur = utilisateurService.getUtilisateurByEmail(principal.getName());
+        UtilisateurDTO utilisateur = utilisateurService.getUtilisateurByEmail(principal.getName());
         if (utilisateurService.hasCalendar(utilisateur.getId(), id)) {
             calendrierService.delete(id);
             return ResponseEntity.ok().build();

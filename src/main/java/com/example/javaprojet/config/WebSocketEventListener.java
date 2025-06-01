@@ -1,4 +1,5 @@
 package com.example.javaprojet.config;
+import com.example.javaprojet.dto.UtilisateurDTO;
 import com.example.javaprojet.entity.Message;
 import com.example.javaprojet.entity.Utilisateur;
 import com.example.javaprojet.services.MessageService;
@@ -38,9 +39,9 @@ public class WebSocketEventListener {
             // Récupérer la salle concernée
             salleDiscussionService.getSalleById(salleId).ifPresent(salle -> {
                 // Trouver l'utilisateur par nom
-                List<Utilisateur> utilisateurs = utilisateurService.findByNom(username);
+                List<UtilisateurDTO> utilisateurs = utilisateurService.findByNom(username);
                 if (!utilisateurs.isEmpty()) {
-                    Utilisateur utilisateur = utilisateurs.get(0);
+                    UtilisateurDTO utilisateur = utilisateurs.get(0);
                     // Créer un message de déconnexion
                     Message message = messageService.creerUserLeaveMessage(utilisateur, salle);
 

@@ -1,8 +1,11 @@
 package com.example.javaprojet.Controller;
 
+import com.example.javaprojet.dto.TacheDTO;
+import com.example.javaprojet.dto.UtilisateurDTO;
 import com.example.javaprojet.entity.Tache;
 import com.example.javaprojet.entity.Utilisateur;
 import com.example.javaprojet.services.TacheService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
@@ -19,15 +22,15 @@ public class TacheController {
 
     @Secured({"ROLE_ADMIN_PROJET"})
     @PostMapping
-    public ResponseEntity<Tache> creerTache(@RequestBody Tache tache) {
+    public ResponseEntity<Tache> creerTache(@RequestBody @Valid TacheDTO tache) {
         Tache nouvelleTache = tacheService.creerTache(tache);
         return ResponseEntity.ok(nouvelleTache);
     }
     @Secured({ "ROLE_ADMIN_PROJET"})
     @PutMapping("/{id}")
-    public ResponseEntity<Tache> mettreAJourTache(@PathVariable Long id, @RequestBody Tache tacheModifiee) {
+    public ResponseEntity<Tache> mettreAJourTache( @RequestBody @Valid TacheDTO tacheModifiee) {
         try {
-            Tache tacheMiseAJour = tacheService.mettreAJourTache(id, tacheModifiee);
+            Tache tacheMiseAJour = tacheService.mettreAJourTache( tacheModifiee);
             return ResponseEntity.ok(tacheMiseAJour);
         } catch (RuntimeException e) {
             return ResponseEntity.notFound().build(); // Si la tâche n'est pas trouvée
@@ -35,9 +38,9 @@ public class TacheController {
     }
     @Secured({"ROLE_ADMIN_PROJET"})
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> supprimerTache(@PathVariable Long id) {
+    public ResponseEntity<Void> supprimerTache(@PathVariable @Valid TacheDTO tacheDTO) {
         try {
-            tacheService.supprimerTache(id);
+            tacheService.supprimerTache(tacheDTO);
             return ResponseEntity.noContent().build(); // Retourne 204 No Content
         } catch (RuntimeException e) {
             return ResponseEntity.notFound().build(); // Si la tâche n'est pas trouvée
@@ -45,9 +48,10 @@ public class TacheController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Tache> recupererTacheParId(@PathVariable Long id) {
+    public ResponseEntity<Tache> recupererTacheParId(@PathVariable @Valid TacheDTO tacheDTO) {
+
         try {
-            Tache tache = tacheService.recupererTacheParId(id);
+            Tache tache = tacheService.recupererTacheParId(tacheDTO);
             return ResponseEntity.ok(tache);
         } catch (RuntimeException e) {
             return ResponseEntity.notFound().build(); // Si la tâche n'est pas trouvée
@@ -55,33 +59,23 @@ public class TacheController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Tache>> recupererToutesLesTaches() {
-        List<Tache> taches = tacheService.recupererToutesLesTaches();
+    public ResponseEntity<List<TacheDTO>> recupererToutesLesTaches() {
+        List<TacheDTO> taches = tacheService.recupererToutesLesTaches();
         return ResponseEntity.ok(taches);
     }
 
     @GetMapping("/etat")
-    public ResponseEntity<List<Tache>> recupererTachesParEtat(@RequestParam String etat) {
-        List<Tache> taches = tacheService.recupererTachesParEtat(etat);
+    public ResponseEntity<List<TacheDTO>> recupererTachesParEtat(@RequestParam String etat) {
+        List<TacheDTO> taches = tacheService.recupererTachesParEtat(etat);
         return ResponseEntity.ok(taches);
     }
 
-    @GetMapping("/utilisateur/{utilisateurId}")
-    public ResponseEntity<List<Tache>> recupererTachesParUtilisateur(@PathVariable Long utilisateurId) {
-        List<Tache> taches = tacheService.recupererTachesParUtilisateur(utilisateurId);
-        return ResponseEntity.ok(taches);
-    }
 
-    @GetMapping("/projet/{projetId}")
-    public ResponseEntity<List<Tache>> recupererTachesParProjet(@PathVariable Long projetId) {
-        List<Tache> taches = tacheService.recupererTachesParProjet(projetId);
-        return ResponseEntity.ok(taches);
-    }
 
     @PutMapping("/{id}/etat")
-    public ResponseEntity<Tache> changerEtat(@PathVariable Long id, @RequestParam String nouvelEtat) {
+    public ResponseEntity<Tache> changerEtat(@PathVariable TacheDTO tacheDTO, @RequestParam String nouvelEtat) {
         try {
-            Tache tacheMiseAJour = tacheService.changerEtat(id, nouvelEtat);
+            Tache tacheMiseAJour = tacheService.changerEtat(tacheDTO, nouvelEtat);
             return ResponseEntity.ok(tacheMiseAJour);
         } catch (RuntimeException e) {
             return ResponseEntity.notFound().build(); // Si la tâche n'est pas trouvée
@@ -89,9 +83,9 @@ public class TacheController {
     }
 
     @PutMapping("/{id}/assigner")
-    public ResponseEntity<Tache> assignerTacheAUtilisateur(@PathVariable Long id, @RequestBody Utilisateur utilisateur) {
+    public ResponseEntity<Tache> assignerTacheAUtilisateur(@PathVariable TacheDTO tacheDTO, @RequestBody UtilisateurDTO utilisateur) {
         try {
-            Tache tacheAssignee = tacheService.assignerA(id, utilisateur);
+            Tache tacheAssignee = tacheService.assignerA(tacheDTO, utilisateur);
             return ResponseEntity.ok(tacheAssignee);
         } catch (RuntimeException e) {
             return ResponseEntity.notFound().build(); // Si la tâche n'est pas trouvée

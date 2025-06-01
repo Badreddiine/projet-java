@@ -2,6 +2,8 @@ package com.example.javaprojet.entity;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
+
+import com.example.javaprojet.dto.SalleDiscussionDTO;
 import com.example.javaprojet.enums.TypeSalle;
 import jakarta.persistence.*;
 import lombok.*;
@@ -42,7 +44,8 @@ public class SalleDiscussion {
     private Groupe groupe;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "salle", cascade = CascadeType.ALL,fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "salle", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @Builder.Default
     private Set<Message> messages = new HashSet<>();
 
     @JsonIgnore
@@ -52,6 +55,7 @@ public class SalleDiscussion {
             joinColumns = @JoinColumn(name = "salle_id"),
             inverseJoinColumns = @JoinColumn(name = "utilisateur_id")
     )
+    @Builder.Default
     private Set<Utilisateur> membres = new HashSet<>();
 
     @JsonIgnore
@@ -78,5 +82,18 @@ public class SalleDiscussion {
             default:
                 return "/topic/salle/" + id;
         }
+    }
+
+    public SalleDiscussion(SalleDiscussionDTO salleDTO) {
+        setId(salleDTO.getId());
+        setNom(salleDTO.getNom());
+        setDescription(salleDTO.getDescription());
+        setTypeSalle(salleDTO.getTypeSalle());
+        setEstPublique(salleDTO.isEstPublique());
+        setDateCreation(salleDTO.getDateCreation());
+        setProjet(salleDTO.getProjet());
+        setGroupe(salleDTO.getGroupe());
+        setMessages(new HashSet<>());
+        setMembres(new HashSet<>());
     }
 }
