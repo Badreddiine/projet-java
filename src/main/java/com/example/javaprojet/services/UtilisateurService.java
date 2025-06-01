@@ -1,294 +1,254 @@
 package com.example.javaprojet.services;
 
-import com.example.javaprojet.dto.ProjetDTO;
 import com.example.javaprojet.dto.UtilisateurDTO;
-import com.example.javaprojet.entity.*;
-import com.example.javaprojet.enums.RoleSecondaire;
-import com.example.javaprojet.enums.RoleType;
-import com.example.javaprojet.enums.StatutProjet;
-import com.example.javaprojet.repo.*;
-import jakarta.persistence.EntityNotFoundException;
+import com.example.javaprojet.entity.Projet;
+import com.example.javaprojet.entity.Utilisateur;
+import com.example.javaprojet.repo.ProjetRepesitory;
+import com.example.javaprojet.repo.UtilisateurRepository;
 import jakarta.transaction.Transactional;
-import org.hibernate.Hibernate;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.DefaultAuthenticationEventPublisher;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
-import java.util.Scanner;
-import java.util.stream.Collectors;
+import java.util.Set;
 
 @Service
+@Transactional
 public class UtilisateurService {
 
-    @Autowired
-    UtilisateurRepesitory utilisateurRepesitory;
+    private final ProjetRepesitory projetRepesitory;
+    private PasswordEncoder passwordEncoder;
+    private final UtilisateurRepository utilisateurRepository;
 
-    @Autowired
-    GroupeRepesitory groupeRepesitory;
-
-    @Autowired
-    ProjetRepesitory projetRepesitory;
-    @Autowired
-    private ProjetRoleRepository projetRoleRepository;
-
-    @Autowired
-    private DefaultAuthenticationEventPublisher authenticationEventPublisher;
-
-    @Autowired
-    PasswordEncoder passwordEncoder;
-
-    public void creeCompte(UtilisateurDTO utilisateurDTO) throws Exception {
-        List<Utilisateur> listExist = utilisateurRepesitory.findByEmail(utilisateurDTO.getEmail());
-        if (listExist.isEmpty()) {
-            Utilisateur utilisateur = convertToEntity(utilisateurDTO);
-            utilisateur.setRole(RoleType.GUEST);
-            // TODO : This should change later
-            utilisateur.setRoleSecondaire(RoleSecondaire.GUESS);
-            if (utilisateurDTO.hasPassword()) {
-                utilisateur.setMotDePasse(passwordEncoder.encode(utilisateurDTO.getMotDePasse()));
-            }
-
-            utilisateurRepesitory.save(utilisateur);
-            System.out.println("Compte créé avec succès !");
-        } else {
-            throw new Exception("User already exist!");
-        }
+    public UtilisateurService(UtilisateurRepository utilisateurRepository,
+                              PasswordEncoder passwordEncoder,
+                              ProjetRepesitory projetRepesitory) {
+        this.utilisateurRepository = utilisateurRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.projetRepesitory = projetRepesitory;
     }
 
-    public boolean seConnecter(String email, String motPasse) {
-        List<Utilisateur> userExist = utilisateurRepesitory.findByEmailAndMotDePasse(email, motPasse);
-        if (!userExist.isEmpty()) {
-            Utilisateur utilisateur = userExist.get(0);
-            setConnecte(utilisateur, true);
-            return true;
-        } else {
-            return false;
+    /**
+     * creation utilisateur vas etre utiliser dans incription et
+     * verifications dans controlleur
+     * @param utilisateurDTO data de utilisateur qu'on vas creer
+     * @return entite de utilisateur cree
+     */
+    public Utilisateur creerUtilisateur(UtilisateurDTO utilisateurDTO) {
+        if (utilisateurDTO.getMotDePasse() != null && !utilisateurDTO.getMotDePasse().isEmpty()) {
+            String motDePasseEncode = passwordEncoder.encode(utilisateurDTO.getMotDePasse());
+            utilisateurDTO.setMotDePasse(motDePasseEncode);
         }
+
+        if (utilisateurDTO.getDateInscription() == null) {
+            utilisateurDTO.setDateInscription(new Date());
+        }
+        Utilisateur utilisateur= new Utilisateur(utilisateurDTO);
+
+        return utilisateurRepository.save(utilisateur);
     }
 
-    @Transactional
-    public void demanderCreationProjet(Projet projet) {
-        if (projet.getGroupe() == null || projet.getAdmin() == null) {
-            throw new IllegalArgumentException("Le groupe et l'admin du projet sont obligatoires");
-        }
+    /**
+     * changes mot de passe de utilistaeur
+     * elle ne verifis pas utilisateur courant (ou admin) il faut les verifier avant de etuliser
+     * @param utilisateurId
+     * @param nouveauMotDePasse
+     * @return
+     */
+    public void changerMotDePasse(Long utilisateurId, String nouveauMotDePasse) throws RuntimeException {
+        Utilisateur utilisateur = utilisateurRepository.findById(utilisateurId)
+                .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé"));
 
-        if (projet.getNomCourt() == null || projet.getNomCourt().isBlank()) {
-            throw new IllegalArgumentException("Le nom court du projet est obligatoire");
-        }
+        utilisateur.setMotDePasse(passwordEncoder.encode(nouveauMotDePasse));
 
-        Groupe groupe = groupeRepesitory.findById(projet.getGroupe().getId())
-                .orElseThrow(() -> new EntityNotFoundException("Groupe introuvable"));
+    }
 
-        Utilisateur admin = utilisateurRepesitory.findById(projet.getAdmin().getId())
-                .orElseThrow(() -> new EntityNotFoundException("Admin introuvable"));
+//    public boolean verifierMotDePasse(String motDePasseClair, String motDePasseEncode) {
+//        return passwordEncoder.matches(motDePasseClair, motDePasseEncode);
+//    }
 
-        if (!groupe.getMembres().contains(admin)) {
-            throw new IllegalStateException("L'admin doit être membre du groupe");
-        }
+//    public boolean verifierCredentials(String email, String motDePasseClair) {
+//        Utilisateur utilisateur = utilisateurRepository.findByEmail(email)
+//                .stream().findFirst()
+//                .orElse(null);
+//
+//        if (utilisateur == null) {
+//            return false;
+//        }
+//
+//        return passwordEncoder.matches(motDePasseClair, utilisateur.getMotDePasse());
+//    }
+//
+    // Nouvelles méthodes pour la gestion des projets
 
-        projet.setStatutProjet(StatutProjet.EN_ATTENTE);
-        projet.setGroupe(groupe);
-        projet.setAdmin(admin);
-        projet.setDateCreation(new Date());
-        projet.getMembres().add(admin);
+    /**
+     * Ajouter un utilisateur comme membre d'un projet
+     * il faut verifier dans le controlleur si le rolle de user est admin_projet
+     * verifier si il est en attend deja
+     */
+    public void accepterMembreAuProjet(Utilisateur utilisateur, Projet projet) {
+        projet.getMembres().add(utilisateur);
         projetRepesitory.save(projet);
     }
 
-    @Transactional
-    public void modifierProfil(Long idUser, UtilisateurDTO utilisateurModifieDTO) {
-        Optional<Utilisateur> userExist = utilisateurRepesitory.findById(idUser);
-        if (userExist.isPresent()) {
-            Utilisateur user = userExist.get();
+    /**
+     * Retirer un utilisateur d'un projet
+     * verifies autorisattion
+     */
+    public void retirerMembreDuProjet(Utilisateur utilisateur, Projet projet) {
+        projet.getMembres().remove(utilisateur);
+        projet.getAdmins().remove(utilisateur);
+        projet.getDemandeursEnAttente().remove(utilisateur);
+        projetRepesitory.save(projet);
+    }
 
-            if (!user.getEmail().equals(utilisateurModifieDTO.getEmail()) &&
-                    !utilisateurRepesitory.findByEmail(utilisateurModifieDTO.getEmail()).isEmpty()) {
-                throw new RuntimeException("Cet email est deja utilise par un autre utilisateur.");
-            }
+    /**
+     * Ajouter un utilisateur comme admin d'un projet
+     * verifier autorisation
+     */
+    public void ajouterAdminAuProjet(Utilisateur utilisateur, Projet projet) {
+        // Ajouter comme membre et admin
+        projet.getMembres().add(utilisateur);
+        projet.getAdmins().add(utilisateur);
+        projetRepesitory.save(projet);
+    }
 
-            user.setNom(utilisateurModifieDTO.getNom());
-            user.setPrenom(utilisateurModifieDTO.getPrenom());
-            user.setEmail(utilisateurModifieDTO.getEmail());
-
-            // Handle password update if provided
-            if (utilisateurModifieDTO.hasPassword()) {
-                user.setMotDePasse(passwordEncoder.encode(utilisateurModifieDTO.getMotDePasse()));
-            }
-
-            // Update other fields if needed
-            if (utilisateurModifieDTO.getAvatar() != null) {
-                user.setAvatar(utilisateurModifieDTO.getAvatar());
-            }
-
-            utilisateurRepesitory.save(user);
-        } else {
-            throw new RuntimeException("Utilisateur non trouve avec lID: " + idUser);
+    /**
+     * Retirer les droits d'admin d'un utilisateur (mais reste membre)
+     * verifier autorisation
+     */
+    public void retirerAdminDuProjet(Utilisateur utilisateur, Projet projet) {
+        // Vérifier que ce n'est pas l'admin principal
+        if (projet.getAdmin() != null && projet.getAdmin().getId().equals(utilisateur.getId())) {
+            throw new RuntimeException("Impossible de retirer les droits de l'admin principal");
         }
+
+        projet.getAdmins().remove(utilisateur);
+        projetRepesitory.save(projet);
     }
 
-    public List<Projet> listeProjets() {
-        return projetRepesitory.findByEstPublic(true);
-    }
-
-    public void adminProjet(Long idProjet) {
-        Optional<Projet> projet = projetRepesitory.findById(idProjet);
-        if (projet.isPresent()) {
-            System.out.println("l'Admin de ce Projet de " + projet.get().getNomLong() +
-                    " est " + projet.get().getAdmin());
-        }
-    }
-
-    public List<UtilisateurDTO> getMembresDuProjet(Long projetId, Long utilisateurId) {
-        List<Utilisateur> membres = projetRepesitory.findMembresIfUserHasAccess(projetId, utilisateurId);
-        if (membres.isEmpty()) {
-            throw new SecurityException("Accès refusé ou projet inexistant");
-        }
-        return membres.stream()
-                .map(UtilisateurDTO::new)
-                .collect(Collectors.toList());
-    }
-
-    @Transactional
-    public void demanderRejoindreProjet(Long projetId, Long utilisateurId) {
-        Projet projet = projetRoleRepository.findById(projetId)
-                .orElseThrow(() -> new EntityNotFoundException("Projet non trouvé")).getProjet();
-
-        Utilisateur utilisateur = utilisateurRepesitory.findById(utilisateurId)
-                .orElseThrow(() -> new EntityNotFoundException("Utilisateur non trouvé"));
-
+    /**
+     * Ajouter une demande d'adhésion en attente
+     */
+    public void ajouterDemandeAdhesion(Utilisateur utilisateur, Projet projet) {
+        // Vérifier que l'utilisateur n'est pas déjà membre
         if (projet.getMembres().contains(utilisateur)) {
-            throw new IllegalStateException("Déjà membre du projet");
-        }
-
-        if (projet.getDemandeursEnAttente().contains(utilisateur)) {
-            throw new IllegalStateException("Demande déjà en attente");
+            throw new RuntimeException("L'utilisateur est déjà membre du projet");
         }
 
         projet.getDemandeursEnAttente().add(utilisateur);
         projetRepesitory.save(projet);
     }
 
-    public void afficherMesInformations(Long userId) {
-        Utilisateur utilisateur = utilisateurRepesitory.findById(userId).orElse(null);
-        if (utilisateur != null) {
-            Hibernate.initialize(utilisateur.getProjets());
-            System.out.println(utilisateur);
+    /**
+     * Accepter une demande d'adhésion
+     */
+    public void accepterDemandeAdhesion(Utilisateur utilisateur, Projet projet) {
+        if (projet.getDemandeursEnAttente().contains(utilisateur)) {
+            projet.getDemandeursEnAttente().remove(utilisateur);
+            projet.getMembres().add(utilisateur);
+            projetRepesitory.save(projet);
         } else {
-            System.out.println("Utilisateur non trouvé.");
+            throw new RuntimeException("Aucune demande en attente pour cet utilisateur");
         }
     }
 
-    public UtilisateurDTO getUtilisateurById(Long id) {
-        Optional<Utilisateur> utilisateur = utilisateurRepesitory.findById(id);
-        return utilisateur.map(UtilisateurDTO::new).orElse(null);
+    /**
+     * Rejeter une demande d'adhésion
+     */
+    public void rejeterDemandeAdhesion(Utilisateur utilisateur, Projet projet) {
+        projet.getDemandeursEnAttente().remove(utilisateur);
+        projetRepesitory.save(projet);
     }
 
-    @Transactional
-    public void setConnecte(Utilisateur utilisateur, boolean estConnecte) {
-        if (utilisateur != null) {
-            utilisateur.setEstConnecte(estConnecte);
-            if (estConnecte) {
-                setDerniereConnexion(utilisateur, new Date());
-            }
-            utilisateurRepesitory.save(utilisateur);
-        }
+    /**
+     * Vérifier si un utilisateur est membre d'un projet
+     * contains a verfier
+     */
+    public boolean estMembreDuProjet(Utilisateur utilisateur, Projet projet) {
+        return projet.getMembres().contains(utilisateur);
     }
 
-    @Transactional
-    public void setDerniereConnexion(Utilisateur utilisateur, Date date) {
-        if (utilisateur != null) {
-            utilisateur.setDerniereConnexion(date);
-            utilisateurRepesitory.save(utilisateur);
-        }
+    /**
+     * Vérifier si un utilisateur est admin d'un projet
+     */
+    public boolean estAdminDuProjet(Utilisateur utilisateur, Projet projet) {
+        return projet.getAdmins().contains(utilisateur);
     }
 
-    @Transactional
-    public UtilisateurDTO save(UtilisateurDTO utilisateurDTO) {
-        Utilisateur utilisateur = convertToEntity(utilisateurDTO);
-        Utilisateur saved = utilisateurRepesitory.save(utilisateur);
-        return new UtilisateurDTO(saved);
+    /**
+     * Vérifier si un utilisateur est l'admin principal d'un projet
+     */
+    public boolean estAdminPrincipalDuProjet(Utilisateur utilisateur, Projet projet) {
+        return projet.getAdmin() != null && projet.getAdmin().getId().equals(utilisateur.getId());
     }
 
-    public List<UtilisateurDTO> findByNom(String nom) {
-        List<Utilisateur> utilisateurs = utilisateurRepesitory.findByNomContainingIgnoreCase(nom);
-        return utilisateurs.stream()
-                .map(UtilisateurDTO::new)
-                .collect(Collectors.toList());
+    /**
+     * Obtenir tous les projets où l'utilisateur est membre
+     */
+//    public Set<Projet> getProjetsDeUtilisateur(Utilisateur utilisateur) {
+//        return utilisateur.getProjets(); // Assuming bidirectional relationship
+//    }
+//
+//    /**
+//     * Obtenir tous les projets où l'utilisateur est admin
+//     */
+//    public Set<Projet> getProjetsAdministresParUtilisateur(Utilisateur utilisateur) {
+//        return utilisateur.getProjetsAdministres(); // Assuming bidirectional relationship
+//    }
+
+    /**
+     * Obtenir un utilisateur par ID
+     */
+    public Optional<Utilisateur> getUtilisateurById(Long id) {
+        return utilisateurRepository.findById(id);
     }
 
-    @Transactional
-    public boolean seDeconnecter(Long utilisateurId) {
-        Optional<Utilisateur> utilisateurOpt = utilisateurRepesitory.findById(utilisateurId);
-        if (utilisateurOpt.isPresent()) {
-            setConnecte(utilisateurOpt.get(), false);
-            return true;
-        }
-        return false;
+    /**
+     * Obtenir un utilisateur par email
+     */
+    public Optional<Utilisateur> getUtilisateurByEmail(String email) {
+        return utilisateurRepository.findByEmail(email).stream().findFirst();
     }
 
-    @Transactional
-    public boolean supprimerCompte(Long utilisateurId) {
-        Optional<Utilisateur> utilisateur = utilisateurRepesitory.findById(utilisateurId);
-        if (utilisateur.isPresent()) {
-            utilisateurRepesitory.delete(utilisateur.get());
-            return true;
-        }
-        return false;
+    /**
+     * Obtenir tous les utilisateurs
+     * verifier si admin
+     */
+    public List<Utilisateur> getAllUtilisateurs() {
+
+        return utilisateurRepository.findAll();
     }
 
-    public List<Projet> getProjetsByUtilisateur(Long utilisateurId) {
-        Optional<Utilisateur> utilisateurOpt = utilisateurRepesitory.findById(utilisateurId);
-        if (utilisateurOpt.isPresent()) {
-            Utilisateur utilisateur = utilisateurOpt.get();
-            Hibernate.initialize(utilisateur.getProjets());
-            return (List<Projet>) utilisateur.getProjets();
-        }
-        return List.of();
-    }
+    /**
+     * Supprimer un utilisateur
+     */
+    public void supprimerUtilisateur(Utilisateur utilisateur) {
+        // Retirer l'utilisateur de tous ses projets avant suppression
+//        if (utilisateur.getProjets() != null) {
+//            for (Projet projet : utilisateur.getProjets()) {
+//                projet.getMembres().remove(utilisateur);
+//                projet.getAdmins().remove(utilisateur);
+//                projet.getDemandeursEnAttente().remove(utilisateur);
+//
+//                // Si c'est l'admin principal, il faut gérer la succession
+//                if (projet.getAdmin() != null && projet.getAdmin().equals(utilisateur)) {
+//                    // Logique pour assigner un nouvel admin principal
+//                    if (!projet.getAdmins().isEmpty()) {
+//                        projet.setAdmin(projet.getAdmins().iterator().next());
+//                    } else {
+//                        projet.setAdmin(null);
+//                    }
+//                }
+//                projetRepesitory.save(projet);
+//            }
+//        }
 
-    @Transactional
-    public boolean changerRole(Long utilisateurId, RoleType nouveauRole) {
-        Optional<Utilisateur> utilisateurOpt = utilisateurRepesitory.findById(utilisateurId);
-        if (utilisateurOpt.isPresent()) {
-            Utilisateur utilisateur = utilisateurOpt.get();
-            utilisateur.setRole(nouveauRole);
-            utilisateurRepesitory.save(utilisateur);
-            return true;
-        }
-        return false;
+        utilisateurRepository.delete(utilisateur);
     }
-
-    public Optional<UtilisateurDTO> findById(Long id) {
-        Optional<Utilisateur> utilisateur = utilisateurRepesitory.findById(id);
-        return utilisateur.map(UtilisateurDTO::new);
-    }
-
-    public UtilisateurDTO getUtilisateurByEmail(String email) {
-        Optional<Utilisateur> utilisateur = utilisateurRepesitory.getDistinctByEmail(email);
-        return utilisateur.map(UtilisateurDTO::new).orElse(null);
-    }
-
-    public boolean hasCalendar(Long utilisateurId, Long calendarId) {
-        return utilisateurRepesitory.hasCalendar(utilisateurId, calendarId);
-    }
-
-    // Helper method to convert DTO to Entity
-    private Utilisateur convertToEntity(UtilisateurDTO dto) {
-        Utilisateur utilisateur = new Utilisateur();
-        utilisateur.setId(dto.getId());
-        utilisateur.setNom(dto.getNom());
-        utilisateur.setPrenom(dto.getPrenom());
-        utilisateur.setEmail(dto.getEmail());
-        utilisateur.setAvatar(dto.getAvatar());
-        utilisateur.setEstEnLigne(dto.isEstEnLigne());
-        return utilisateur;
-    }
-
-    // Helper method to get entity by ID (for internal use)
-    private Utilisateur getUtilisateurEntityById(Long id) {
-        return utilisateurRepesitory.findById(id).orElse(null);
+    public Utilisateur saveUtilisateur(Utilisateur utilisateur) {
+        return utilisateurRepository.save(utilisateur);
     }
 }

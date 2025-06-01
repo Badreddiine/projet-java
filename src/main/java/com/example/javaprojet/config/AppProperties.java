@@ -7,6 +7,8 @@ import org.springframework.context.annotation.Configuration;
 import java.util.ArrayList;
 import java.util.List;
 
+// TODO : Check if this does anything
+// reminder bli l prof ghadi iswlek
 @Configuration
 @ConfigurationProperties(prefix = "app")
 public class AppProperties {

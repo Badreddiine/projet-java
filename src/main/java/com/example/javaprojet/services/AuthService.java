@@ -1,12 +1,10 @@
 package com.example.javaprojet.services;
 
-
 import com.example.javaprojet.dto.AuthRequestDTO;
 import com.example.javaprojet.dto.AuthResponseDTO;
 import com.example.javaprojet.dto.UtilisateurDTO;
 import com.example.javaprojet.entity.Utilisateur;
-import com.example.javaprojet.MAPPERS.UtilisateurMapper;
-import com.example.javaprojet.repo.UtilisateurRepesitory;
+import com.example.javaprojet.repo.UtilisateurRepository;
 import com.example.javaprojet.security.JwtService;
 import com.example.javaprojet.entity.UserPrincipal;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,10 +27,7 @@ public class AuthService {
     private JwtService jwtService;
 
     @Autowired
-    private UtilisateurRepesitory utilisateurRepository;
-
-    @Autowired
-    private UtilisateurMapper utilisateurMapper;
+    private UtilisateurRepository utilisateurRepository;
 
     public AuthResponseDTO authenticateUser(AuthRequestDTO loginRequest) throws RuntimeException {
         Authentication authentication = authenticationManager.authenticate(
@@ -58,12 +53,15 @@ public class AuthService {
             utilisateur.setRefreshToken(refreshToken);
             utilisateurRepository.save(utilisateur);
 
+            // Utiliser le constructeur de UtilisateurDTO qui prend un Utilisateur
+            UtilisateurDTO utilisateurDTO = new UtilisateurDTO(utilisateur);
+
             return new AuthResponseDTO(
                     accessToken,
                     refreshToken,
                     "Bearer",
                     jwtService.extractExpiration(accessToken).getTime() - System.currentTimeMillis(),
-                    utilisateurMapper.toDTO(utilisateur)
+                    utilisateurDTO
             );
         }
 
@@ -88,12 +86,15 @@ public class AuthService {
             utilisateur.setRefreshToken(newRefreshToken);
             utilisateurRepository.save(utilisateur);
 
+            // Utiliser le constructeur de UtilisateurDTO qui prend un Utilisateur
+            UtilisateurDTO utilisateurDTO = new UtilisateurDTO(utilisateur);
+
             return new AuthResponseDTO(
                     newAccessToken,
                     newRefreshToken,
                     "Bearer",
                     jwtService.extractExpiration(newAccessToken).getTime() - System.currentTimeMillis(),
-                    utilisateurMapper.toDTO(utilisateur)
+                    utilisateurDTO
             );
         } catch (Exception e) {
             throw new RuntimeException("Erreur lors du rafraîchissement du token: " + e.getMessage());
@@ -125,7 +126,8 @@ public class AuthService {
             List<Utilisateur> users = utilisateurRepository.findByEmail(userPrincipal.getUsername());
 
             if (!users.isEmpty()) {
-                return utilisateurMapper.toDTO(users.get(0));
+                // Utiliser le constructeur de UtilisateurDTO qui prend un Utilisateur
+                return new UtilisateurDTO(users.get(0));
             }
         }
 

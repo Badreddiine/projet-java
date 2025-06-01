@@ -1,280 +1,291 @@
 package com.example.javaprojet.services;
-
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
-import com.example.javaprojet.enums.RoleType;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import com.example.javaprojet.entity.Groupe;
+import com.example.javaprojet.dto.ProjetDTO;
 import com.example.javaprojet.entity.Projet;
-import com.example.javaprojet.entity.ProjetRole;
 import com.example.javaprojet.entity.Utilisateur;
-import com.example.javaprojet.enums.RoleSecondaire;
 import com.example.javaprojet.enums.StatutProjet;
-import com.example.javaprojet.repo.GroupeRepesitory;
 import com.example.javaprojet.repo.ProjetRepesitory;
-import com.example.javaprojet.repo.ProjetRoleRepository;
-import com.example.javaprojet.repo.UtilisateurRepesitory;
+import com.example.javaprojet.repo.UtilisateurRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import jakarta.persistence.EntityNotFoundException;
-import jakarta.transaction.Transactional;
+import java.util.*;
+import java.util.stream.Collectors;
 
-/**
- * Service gérant les opérations liées aux projets
- */
 @Service
+@RequiredArgsConstructor
+@Transactional
 public class ProjetService {
-    private static final String ERREUR_PROJET_NON_TROUVE = "Projet non trouvé";
-    private static final String ERREUR_ADMIN_NON_TROUVE = "Administrateur non trouvé";
-    private static final String ERREUR_UTILISATEUR_NON_TROUVE = "Utilisateur non trouvé";
-    private static final String ERREUR_PROJET_DEJA_ACCEPTE = "Le projet a déjà été accepté";
-    private static final String ERREUR_PROJET_DEJA_REFUSE = "Le projet a déjà été refusé";
-    private static final String ERREUR_AUCUN_GROUPE = "Aucun groupe associé";
-    private static final String ERREUR_UTILISATEUR_NON_MEMBRE = "L'utilisateur ne fait pas partie de ce projet";
-    private static final String ERREUR_AUCUNE_DEMANDE = "Aucune demande trouvée pour cet utilisateur";
-    private static final String ERREUR_ADMIN = "Seuls les administrateurs de projet peuvent effectuer cette opération ";
-    private static final String ERREUR_ADMIN_PROJET="seul l'admin que peut effectuer cette operation";
 
-    @Autowired
-    private ProjetRepesitory projetRepesitory;
-    @Autowired
-    private GroupeRepesitory groupeRepesitory;
-    @Autowired
-    private ProjetRoleRepository projetRoleRepository;
-    @Autowired
-    private UtilisateurRepesitory utilisateurRepesitory;
+    private final ProjetRepesitory projetRepository;
+    private final UtilisateurRepository utilisateurRepository;
 
     /**
-     * Accepte un projet
-     * @param idProjet ID du projet à accepter
-     * @param idUserConnecter ID de l'utilisateur connecté
-     * @throws EntityNotFoundException si le projet ou l'administrateur n'est pas trouvé
-     * @throws IllegalStateException si l'utilisateur n'a pas les droits ou si le projet est déjà accepté/refusé
+     *
+     * @param projetDTO
+     * @param admin
+     * @return
+     */
+    public Projet creerProjet(ProjetDTO projetDTO, Utilisateur admin) {
+        Projet projet = new Projet(projetDTO);
+        projet.setDateCreation(new Date());
+        projet.setStatutProjet(StatutProjet.EN_ATTENTE);
+        projet.setMainAdmin(admin);
+        return projetRepository.save(projet);
+    }
+
+    public Optional<Projet> getProjetById(Long id) {
+        return projetRepository.findById(id);
+    }
+
+    public List<Projet> getAllProjets() {
+        return projetRepository.findAll();
+    }
+
+    public List<Projet> getProjetsPublics() {
+        return projetRepository.findAll().stream()
+                .filter(Projet::isEstPublic)
+                .collect(Collectors.toList());
+    }
+
+    public List<Projet> getProjetsByStatut(StatutProjet statut) {
+        return projetRepository.findAll().stream()
+                .filter(p -> p.getStatutProjet() == statut)
+                .collect(Collectors.toList());
+    }
+
+    public List<Projet> getProjetsByTheme(String theme) {
+        return projetRepository.findAll().stream()
+                .filter(p -> theme.equals(p.getTheme()))
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * a chsnger avec un seulle dto ProjetDTO nouvellesDonnees
+     * @param projetExistant
+     * @param nouvellesDonnees
+     * @return
      */
     @Transactional
-    public void accepterProjet(Long idProjet, Long idUserConnecter) {
+    public Projet mettreAJourProjet(Projet projetExistant, Projet nouvellesDonnees) {
+        if (nouvellesDonnees.getNomCourt() != null) projetExistant.setNomCourt(nouvellesDonnees.getNomCourt());
+        if (nouvellesDonnees.getNomLong() != null) projetExistant.setNomLong(nouvellesDonnees.getNomLong());
+        if (nouvellesDonnees.getDescription() != null) projetExistant.setDescription(nouvellesDonnees.getDescription());
+        if (nouvellesDonnees.getTheme() != null) projetExistant.setTheme(nouvellesDonnees.getTheme());
+        if (nouvellesDonnees.getType() != null) projetExistant.setType(nouvellesDonnees.getType());
+        if (nouvellesDonnees.getLicense() != null) projetExistant.setLicense(nouvellesDonnees.getLicense());
+        projetExistant.setEstPublic(nouvellesDonnees.isEstPublic());
+        return projetRepository.save(projetExistant);
+    }
 
-        Projet projet = projetRepesitory.findById(idProjet)
-                .orElseThrow(() -> new EntityNotFoundException(ERREUR_PROJET_NON_TROUVE));
 
-        Utilisateur admin = utilisateurRepesitory.findById(idUserConnecter)
-                .orElseThrow(() -> new EntityNotFoundException(ERREUR_ADMIN_NON_TROUVE));
-
-        if(!admin.getRoleSecondaire().equals(RoleType.ADMIN)){
-            throw new IllegalStateException(ERREUR_ADMIN);
-        }
-
-        if (!StatutProjet.EN_ATTENTE.equals(projet.getStatutProjet())) {
-            throw new IllegalStateException(ERREUR_PROJET_DEJA_REFUSE);
-        }
-
+    public Projet accepterProjet(Long id) throws RuntimeException {
+        Projet projet=projetRepository.findById(id).orElseThrow(()->new RuntimeException("Projet non trouv<UNK>"));
         projet.setStatutProjet(StatutProjet.ACCEPTER);
         projet.setDateAcceptation(new Date());
-
-        Groupe groupe = projet.getGroupe();
-        if (groupe == null) {
-            throw new IllegalStateException(ERREUR_AUCUN_GROUPE);
-        }
-
-        if (!groupe.getProjets().contains(projet)) {
-            groupe.getProjets().add(projet);
-            groupeRepesitory.save(groupe);
-        }
-
-        projetRepesitory.save(projet);
+        projet.setDateRejet(null);
+        return projetRepository.save(projet);
     }
+
     @Transactional
-    public void rejeterProjet(Long projetId, Long idUserConnecter) {
-        Projet projet = projetRepesitory.findById(projetId)
-                .orElseThrow(() -> new EntityNotFoundException(ERREUR_PROJET_NON_TROUVE ));
-
-        Utilisateur admin = utilisateurRepesitory.findById(idUserConnecter)
-                .orElseThrow(() -> new EntityNotFoundException(ERREUR_ADMIN_NON_TROUVE));
-
-        if(!admin.getRoleSecondaire().equals(RoleType.ADMIN)){
-            throw new IllegalStateException(ERREUR_ADMIN);
-        }
-
-        if (StatutProjet.REFUSER.equals(projet.getStatutProjet())) {
-            throw new IllegalStateException(ERREUR_PROJET_DEJA_REFUSE);
-        }
-        if (StatutProjet.ACCEPTER.equals(projet.getStatutProjet())) {
-            throw new IllegalStateException(ERREUR_PROJET_DEJA_ACCEPTE);
-        }
-
+    public Projet rejeterProjet(Long id) throws RuntimeException {
+        Projet projet=projetRepository.findById(id).orElseThrow(()->new RuntimeException("Projet non trouv<UNK>"));
         projet.setStatutProjet(StatutProjet.REFUSER);
         projet.setDateRejet(new Date());
+        projet.setDateAcceptation(null);
+        return projetRepository.save(projet);
+    }
 
-        Groupe groupe = projet.getGroupe();
-        if (groupe != null) {
-            groupe.getProjets().remove(projet);
-            groupeRepesitory.save(groupe);
+
+    public Projet cloturerProjet(Long id) throws RuntimeException {
+        Projet projet=projetRepository.findById(id).orElseThrow(()->new RuntimeException("Projet non trouv<UNK>"));
+        if (projet.getStatutProjet() != StatutProjet.ACCEPTER) {
+            throw new RuntimeException("Seuls les projets acceptés peuvent être clôturés");
         }
+        projet.setStatutProjet(StatutProjet.CLOTURE);
+        projet.setDateCloture(new Date());
+        return projetRepository.save(projet);
+    }
 
-        projetRepesitory.save(projet);
+
+    public Projet reactiverProjet(Long id) throws RuntimeException {
+        Projet projet=projetRepository.findById(id).orElseThrow(()->new RuntimeException("Projet non trouv<UNK>"));
+        if (projet.getStatutProjet() != StatutProjet.CLOTURE) {
+            throw new RuntimeException("Seuls les projets clôturés peuvent être réactivés");
+        }
+        projet.setStatutProjet(StatutProjet.ACCEPTER);
+        projet.setDateCloture(null);
+        return projetRepository.save(projet);
     }
 
     @Transactional
-    public void supprimerProjet(Long projetId, Long adminId) {
-        Utilisateur admin = utilisateurRepesitory.findById(adminId)
-                .orElseThrow(() -> new EntityNotFoundException(ERREUR_PROJET_NON_TROUVE));
-
-        Projet projet = projetRepesitory.findById(projetId)
-                .orElseThrow(() -> new EntityNotFoundException(ERREUR_PROJET_NON_TROUVE));
-
-       if(admin.getRoleSecondaire().equals(RoleSecondaire.ADMIN_PROJET)){
-           projetRoleRepository.deleteByProjetId(projetId);
-           projetRepesitory.delete(projet);
-       }
+    public void ajouterMembre(Long id , Long userid ) throws RuntimeException {
+        Projet projet=projetRepository.findById(id).orElseThrow(()->new RuntimeException("Projet non trouv<UNK>"));
+        Utilisateur utilisateur =utilisateurRepository.findUtilisateurById(userid);
+        if (projet.getMembres().contains(utilisateur)) {
+            throw new RuntimeException("L'utilisateur est déjà membre du projet");
+        }
+        projet.getMembres().add(utilisateur);
+        projetRepository.save(projet);
     }
-    /**
-     * Supprime un membre d'un projet
-     * @param utilisateurId ID de l'utilisateur à supprimer
-     * @param adminId ID de l'administrateur effectuant l'opération
-     * @param projetId ID du projet
-     * @throws EntityNotFoundException si le projet, l'administrateur ou l'utilisateur n'est pas trouvé
-     * @throws IllegalStateException si l'administrateur n'a pas les droits
-     */
+
     @Transactional
-    public void supprimerMembre(Long utilisateurId, Long adminId, Long projetId) {
-        if (utilisateurId == null || adminId == null || projetId == null) {
-            throw new IllegalArgumentException("Les IDs ne peuvent pas être null");
+    public void retirerMembre(Long id , Long userid) {
+        Projet projet=projetRepository.findById(id).orElseThrow(()->new RuntimeException("Projet non trouv<UNK>"));
+        Utilisateur utilisateur =utilisateurRepository.findUtilisateurById(userid);
+        if (projet.getAdmin() != null && projet.getAdmin().getId().equals(utilisateur.getId())) {
+            throw new RuntimeException("L'admin principal ne peut pas être retiré du projet");
         }
-
-        Utilisateur admin = utilisateurRepesitory.findById(adminId)
-                .orElseThrow(() -> new EntityNotFoundException(ERREUR_ADMIN_NON_TROUVE));
-
-        Projet projet = projetRepesitory.findById(projetId)
-                .orElseThrow(() -> new EntityNotFoundException(ERREUR_PROJET_NON_TROUVE));
-
-        Utilisateur utilisateur = utilisateurRepesitory.findById(utilisateurId)
-                .orElseThrow(() -> new EntityNotFoundException(ERREUR_UTILISATEUR_NON_TROUVE));
-
-        if(!admin.getRoleSecondaire().equals(RoleSecondaire.ADMIN_PROJET)){
-            throw new IllegalStateException(ERREUR_ADMIN_PROJET);
-        }
-
-        if (!projet.getMembres().contains(utilisateur)) {
-            throw new IllegalStateException(ERREUR_UTILISATEUR_NON_MEMBRE);
-        }
-
         projet.getMembres().remove(utilisateur);
-        utilisateur.getProjets().remove(projet);
-
-        projetRoleRepository.deleteByProjetAndUtilisateur(projet, utilisateur);
-        projetRepesitory.save(projet);
-        utilisateurRepesitory.save(utilisateur);
+        projet.getAdmins().remove(utilisateur);
+        projet.getDemandeursEnAttente().remove(utilisateur);
+        projetRepository.save(projet);
     }
 
     @Transactional
-    public void supprimerUtilisateurDuProjet(Long projetId, Long utilisateurId, Long idUserConnecter) {
-
-        Projet projet = projetRepesitory.findById(projetId)
-                .orElseThrow(() -> new EntityNotFoundException("Projet non trouvé"));
-
-        Utilisateur admin = utilisateurRepesitory.findById(idUserConnecter)
-                .orElseThrow(() -> new EntityNotFoundException("Admin non trouvé"));
-
-        Utilisateur utilisateur = utilisateurRepesitory.findById(utilisateurId)
-                .orElseThrow(() -> new EntityNotFoundException("Utilisateur non trouvé"));
-
+    public void promouvoirEnAdmin(Projet projet, Utilisateur utilisateur) {
         if (!projet.getMembres().contains(utilisateur)) {
-            throw new IllegalStateException("L'utilisateur ne fait pas partie de ce projet");
+            throw new RuntimeException("L'utilisateur doit être membre du projet pour devenir admin");
         }
-        if (admin.getRoleSecondaire().equals(RoleSecondaire.ADMIN_PROJET)) {
-            throw new IllegalStateException("vous etes pas un admin");
-        }
-
-        projetRoleRepository.deleteByProjetAndUtilisateur(projet, utilisateur);
-        projet.getMembres().remove(utilisateur);
-        utilisateur.getProjets().remove(projet);
-
-        projetRepesitory.save(projet);
-        utilisateurRepesitory.save(utilisateur);
+        projet.getAdmins().add(utilisateur);
+        projetRepository.save(projet);
     }
 
     @Transactional
-    public void accepterDemande(Long projetId, Long demandeurId, Long idUserConnecter) {
-        Projet projet = projetRepesitory.findById(projetId)
-                .orElseThrow(() -> new EntityNotFoundException(ERREUR_PROJET_NON_TROUVE));
-
-        Utilisateur demandeur = utilisateurRepesitory.findById(demandeurId)
-                .orElseThrow(() -> new EntityNotFoundException(ERREUR_UTILISATEUR_NON_TROUVE));
-
-        Utilisateur admin = utilisateurRepesitory.findById(idUserConnecter)
-                .orElseThrow(() -> new EntityNotFoundException(ERREUR_UTILISATEUR_NON_TROUVE));
-
-        if(!admin.getRoleSecondaire().equals(RoleSecondaire.ADMIN_PROJET)){
-            throw new IllegalStateException(ERREUR_ADMIN);
+    public void retrograderAdmin(Projet projet, Utilisateur utilisateur) {
+        if (projet.getAdmin() != null && projet.getAdmin().getId().equals(utilisateur.getId())) {
+            throw new RuntimeException("L'admin principal ne peut pas être rétrogradé");
         }
-
-        if (!projet.getDemandeursEnAttente().remove(demandeur)) {
-            throw new IllegalStateException("Aucune demande trouvée pour cet utilisateur");
-        }
-
-        demandeur.setRoleSecondaire(RoleSecondaire.MEMBRE_PROJET);
-        projet.getMembres().add(demandeur);
-        projetRoleRepository.save( ProjetRole.builder()
-                .projet(projet)
-                .roleSecondaire(RoleSecondaire.MEMBRE_PROJET)
-                .utilisateur(demandeur).build()
-        );
-        projetRepesitory.save(projet);
+        projet.getAdmins().remove(utilisateur);
+        projetRepository.save(projet);
     }
 
     @Transactional
-    public void refuserDemande(Long projetId, Long demandeurId, Long idUserConnecter) {
-        Projet projet = projetRepesitory.findById(projetId)
-                .orElseThrow(() -> new EntityNotFoundException(ERREUR_PROJET_NON_TROUVE));
-
-        Utilisateur admin = utilisateurRepesitory.findById(idUserConnecter)
-                .orElseThrow(() -> new EntityNotFoundException(ERREUR_UTILISATEUR_NON_TROUVE));
-
-        Utilisateur demandeur = utilisateurRepesitory.findById(demandeurId)
-                .orElseThrow(() -> new EntityNotFoundException(ERREUR_UTILISATEUR_NON_TROUVE));
-
-        if(!admin.getRoleSecondaire().equals(RoleSecondaire.ADMIN_PROJET)){
-            throw new IllegalStateException(ERREUR_ADMIN);
+    public void changerAdminPrincipal(Projet projet, Utilisateur nouvelAdmin) {
+        if (!projet.getMembres().contains(nouvelAdmin)) {
+            throw new RuntimeException("Le nouvel admin doit être membre du projet");
         }
-
-        if (!projet.getDemandeursEnAttente().remove(demandeur)) {
-            throw new IllegalStateException("Aucune demande trouvée");
-        }
-
-        projetRepesitory.save(projet);
+        projet.setMainAdmin(nouvelAdmin);
+        projetRepository.save(projet);
     }
 
-    /**
-     * Affiche la liste des demandes pour rejoindre un projet
-     * @param projetId ID du projet
-     * @param demandeurId ID du demandeur
-     * @param idUserConnecter ID de l'utilisateur connecté
-     * @throws EntityNotFoundException si le projet ou l'administrateur n'est pas trouvé
-     * @throws IllegalStateException si l'administrateur n'a pas les droits
-     */
-    public List<Utilisateur> afficherListDemandeRejoindreProjet(Long projetId, Long demandeurId, Long idUserConnecter) {
-        if (projetId == null || demandeurId == null || idUserConnecter == null) {
-            throw new IllegalArgumentException("Les IDs ne peuvent pas être null");
+    @Transactional
+    public void promouvoirEnAdmin(Long projetId, Long utilisateurId) {
+        Projet projet = projetRepository.findById(projetId).orElseThrow(() -> new RuntimeException("Projet non trouvé"));
+        Utilisateur utilisateur = utilisateurRepository.findById(utilisateurId).orElseThrow(() -> new RuntimeException("Utilisateur non trouvé"));
+        if (!projet.getMembres().contains(utilisateur)) {
+            throw new RuntimeException("L'utilisateur doit être membre du projet pour devenir admin");
         }
-
-        Projet projet = projetRepesitory.findById(projetId)
-                .orElseThrow(() -> new EntityNotFoundException(ERREUR_PROJET_NON_TROUVE));
-
-        Utilisateur admin = utilisateurRepesitory.findById(idUserConnecter)
-                .orElseThrow(() -> new EntityNotFoundException(ERREUR_ADMIN_NON_TROUVE));
-
-        if(!admin.getRoleSecondaire().equals(RoleSecondaire.ADMIN_PROJET)){
-            throw new IllegalStateException(ERREUR_ADMIN_PROJET);
-        }
-
-        return new ArrayList<>(projet.getDemandeursEnAttente());
+        projet.getAdmins().add(utilisateur);
+        projetRepository.save(projet);
     }
 
-    public List<Projet> getProjet(){
-        return projetRepesitory.findAll();
+    @Transactional
+    public void retrograderAdmin(Long projetId, Long utilisateurId) {
+        Projet projet = projetRepository.findById(projetId).orElseThrow(() -> new RuntimeException("Projet non trouvé"));
+        Utilisateur utilisateur = utilisateurRepository.findById(utilisateurId).orElseThrow(() -> new RuntimeException("Utilisateur non trouvé"));
+        if (projet.getAdmin() != null && projet.getAdmin().getId().equals(utilisateurId)) {
+            throw new RuntimeException("L'admin principal ne peut pas être rétrogradé");
+        }
+        projet.getAdmins().remove(utilisateur);
+        projetRepository.save(projet);
+    }
+
+    @Transactional
+    public void changerAdminPrincipal(Long projetId, Long nouvelAdminId) {
+        Projet projet = projetRepository.findById(projetId).orElseThrow(() -> new RuntimeException("Projet non trouvé"));
+        Utilisateur nouvelAdmin = utilisateurRepository.findById(nouvelAdminId).orElseThrow(() -> new RuntimeException("Nouvel admin non trouvé"));
+        if (!projet.getMembres().contains(nouvelAdmin)) {
+            throw new RuntimeException("Le nouvel admin doit être membre du projet");
+        }
+        projet.setMainAdmin(nouvelAdmin);
+        projetRepository.save(projet);
+    }
+
+    public Set<Utilisateur> getMembres(Long projetId) {
+        Projet projet = projetRepository.findById(projetId).orElseThrow(() -> new RuntimeException("Projet non trouvé"));
+        return projet.getMembres();
+    }
+
+    public Set<Utilisateur> getAdmins(Long projetId) {
+        Projet projet = projetRepository.findById(projetId).orElseThrow(() -> new RuntimeException("Projet non trouvé"));
+        return projet.getAdmins();
+    }
+
+    public Set<Utilisateur> getDemandesEnAttente(Long projetId) {
+        Projet projet = projetRepository.findById(projetId).orElseThrow(() -> new RuntimeException("Projet non trouvé"));
+        return projet.getDemandeursEnAttente();
+    }
+
+    @Transactional
+    public void traiterDemandeAdhesion(Long projetId, Long utilisateurId, boolean accepter) {
+        Projet projet = projetRepository.findById(projetId).orElseThrow(() -> new RuntimeException("Projet non trouvé"));
+        Utilisateur utilisateur = utilisateurRepository.findById(utilisateurId).orElseThrow(() -> new RuntimeException("Utilisateur non trouvé"));
+        if (!projet.getDemandeursEnAttente().contains(utilisateur)) {
+            throw new RuntimeException("Aucune demande en attente pour cet utilisateur");
+        }
+        projet.getDemandeursEnAttente().remove(utilisateur);
+        if (accepter) {
+            projet.getMembres().add(utilisateur);
+        }
+        projetRepository.save(projet);
+    }
+
+    public boolean peutVoirProjet(Long projetId, Long utilisateurId) {
+        Projet projet = projetRepository.findById(projetId).orElseThrow(() -> new RuntimeException("Projet non trouvé"));
+        if (projet.isEstPublic()) {
+            return true;
+        }
+        if (utilisateurId != null) {
+            Utilisateur utilisateur = utilisateurRepository.findById(utilisateurId).orElse(null);
+            if (utilisateur != null && projet.getMembres().contains(utilisateur)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public List<Projet> rechercherProjets(String motCle) {
+        return projetRepository.findAll().stream()
+                .filter(p ->
+                        (p.getNomCourt() != null && p.getNomCourt().toLowerCase().contains(motCle.toLowerCase())) ||
+                                (p.getNomLong() != null && p.getNomLong().toLowerCase().contains(motCle.toLowerCase())) ||
+                                (p.getDescription() != null && p.getDescription().toLowerCase().contains(motCle.toLowerCase()))
+                )
+                .collect(Collectors.toList());
+    }
+
+    public Map<String, Object> getStatistiquesProjet(Long projetId) {
+        Projet projet = projetRepository.findById(projetId).orElseThrow(() -> new RuntimeException("Projet non trouvé"));
+        Map<String, Object> stats = new HashMap<>();
+        stats.put("nombreMembres", projet.getMembres().size());
+        stats.put("nombreAdmins", projet.getAdmins().size());
+        stats.put("nombreTaches", projet.getTaches() != null ? projet.getTaches().size() : 0);
+        stats.put("nombreReunions", projet.getReunions() != null ? projet.getReunions().size() : 0);
+        stats.put("nombreDocuments", projet.getDepotDocuments() != null ? projet.getDepotDocuments().size() : 0);
+        stats.put("nombreDemandesEnAttente", projet.getDemandeursEnAttente().size());
+        stats.put("dateCreation", projet.getDateCreation());
+        stats.put("statut", projet.getStatutProjet());
+        return stats;
+    }
+
+    @Transactional
+    public void supprimerProjet(Long projetId) {
+        Projet projet = projetRepository.findById(projetId).orElseThrow(() -> new RuntimeException("Projet non trouvé"));
+        projet.getMembres().clear();
+        projet.getAdmins().clear();
+        projet.getDemandeursEnAttente().clear();
+        projetRepository.delete(projet);
+    }
+
+    public boolean aPermissionAdmin(Long projetId, Long utilisateurId) {
+        Projet projet = projetRepository.findById(projetId).orElseThrow(() -> new RuntimeException("Projet non trouvé"));
+        Utilisateur utilisateur = utilisateurRepository.findById(utilisateurId).orElseThrow(() -> new RuntimeException("Utilisateur non trouvé"));
+        return projet.getAdmins().contains(utilisateur);
+    }
+
+    public boolean estAdminPrincipal(Long projetId, Long utilisateurId) {
+        Projet projet = projetRepository.findById(projetId).orElseThrow(() -> new RuntimeException("Projet non trouvé"));
+        return projet.getAdmin() != null && projet.getAdmin().getId().equals(utilisateurId);
     }
 }
-

@@ -1,6 +1,5 @@
 package com.example.javaprojet.config;
 
-import com.example.javaprojet.dto.UtilisateurDTO;
 import com.example.javaprojet.entity.Utilisateur;
 import com.example.javaprojet.services.UtilisateurService;
 import lombok.extern.slf4j.Slf4j;
@@ -12,6 +11,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.Date;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Component
@@ -79,19 +79,25 @@ public class PresenceTracker {
     /**
      * Mettre à jour le statut de connexion d'un utilisateur en base de données
      */
+
     private void updateUserStatus(Long userId, boolean connected) {
         try {
-            UtilisateurDTO utilisateur = utilisateurService.getUtilisateurById(userId);
-            utilisateur.setConnecte(connected);
-            utilisateur.setDerniereConnexion(new Date());
-            utilisateurService.save(utilisateur);
+            Optional<Utilisateur> utilisateurOpt = utilisateurService.getUtilisateurById(userId);
+            if (utilisateurOpt.isPresent()) {
+                Utilisateur utilisateur = utilisateurOpt.get();
+                utilisateur.setConnecte(connected);
+                utilisateur.setDerniereConnexion(new Date());
+                utilisateurService.saveUtilisateur(utilisateur); // or whatever your save method is called
 
-            // Notifier les autres utilisateurs du changement de statut
-            messagingTemplate.convertAndSend("/topic/status", Map.of(
-                    "userId", userId,
-                    "status", connected ? "ONLINE" : "OFFLINE",
-                    "timestamp", System.currentTimeMillis()
-            ));
+                // Notifier les autres utilisateurs du changement de statut
+                messagingTemplate.convertAndSend("/topic/status", Map.of(
+                        "userId", userId,
+                        "status", connected ? "ONLINE" : "OFFLINE",
+                        "timestamp", System.currentTimeMillis()
+                ));
+            } else {
+                log.warn("Utilisateur avec ID {} non trouvé", userId);
+            }
         } catch (Exception e) {
             log.error("Erreur lors de la mise à jour du statut de l'utilisateur {}: {}", userId, e.getMessage());
         }
