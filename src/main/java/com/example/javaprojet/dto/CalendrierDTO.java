@@ -1,15 +1,9 @@
 package com.example.javaprojet.dto;
 
 import com.example.javaprojet.entity.Calendrier;
-import com.example.javaprojet.entity.Evenement;
-import com.example.javaprojet.entity.Utilisateur;
-import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.util.HashSet;
-import java.util.Set;
 
 @Data
 @NoArgsConstructor

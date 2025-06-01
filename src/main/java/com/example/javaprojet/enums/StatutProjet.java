@@ -6,5 +6,6 @@ package com.example.javaprojet.enums;
 public enum StatutProjet {
     EN_ATTENTE,
     ACCEPTER,
-    REFUSER
+    REFUSER,
+    CLOTURE
 }

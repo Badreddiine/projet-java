@@ -23,11 +23,13 @@ public class MessageService {
 
     @Transactional(readOnly = true)
     public Optional<Message> getMessageById(Long id) {
+
         return messageRepository.findById(id);
     }
 
     @Transactional
     public Message saveMessage(Message message) {
+
         return messageRepository.save(message);
     }
 
@@ -68,15 +70,14 @@ public class MessageService {
     }
 
     @Transactional
-    public Message creerUserLeaveMessage(UtilisateurDTO utilisateur, SalleDiscussionDTO salle) {
-        SalleDiscussion salleDiscussion = new SalleDiscussion(salle);
-        Utilisateur uti=new Utilisateur(utilisateur);
+    public Message creerUserLeaveMessage(Utilisateur utilisateur, SalleDiscussion salle) {
+
         Message message = Message.builder()
                 .idExpediteur(utilisateur.getId())
-                .expediteur(uti)
+                .expediteur(utilisateur)
                 .contenu(utilisateur.getNom() + " a quitté la salle")
                 .dateEnvoi(new Date())
-                .salle(salleDiscussion)
+                .salle(salle)
                 .type(MessageType.LEAVE)
                 .estLu(false)
                 .build();
