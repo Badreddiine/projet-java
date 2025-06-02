@@ -5,6 +5,7 @@ import com.example.javaprojet.entity.Projet;
 import com.example.javaprojet.entity.Utilisateur;
 import com.example.javaprojet.repo.ProjetRepesitory;
 import com.example.javaprojet.repo.UtilisateurRepository;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -65,22 +66,6 @@ public class UtilisateurService {
 
     }
 
-//    public boolean verifierMotDePasse(String motDePasseClair, String motDePasseEncode) {
-//        return passwordEncoder.matches(motDePasseClair, motDePasseEncode);
-//    }
-
-//    public boolean verifierCredentials(String email, String motDePasseClair) {
-//        Utilisateur utilisateur = utilisateurRepository.findByEmail(email)
-//                .stream().findFirst()
-//                .orElse(null);
-//
-//        if (utilisateur == null) {
-//            return false;
-//        }
-//
-//        return passwordEncoder.matches(motDePasseClair, utilisateur.getMotDePasse());
-//    }
-//
     // Nouvelles méthodes pour la gestion des projets
 
     /**
@@ -186,24 +171,19 @@ public class UtilisateurService {
     }
 
     /**
-     * Obtenir tous les projets où l'utilisateur est membre
-     */
-//    public Set<Projet> getProjetsDeUtilisateur(Utilisateur utilisateur) {
-//        return utilisateur.getProjets(); // Assuming bidirectional relationship
-//    }
-//
-//    /**
-//     * Obtenir tous les projets où l'utilisateur est admin
-//     */
-//    public Set<Projet> getProjetsAdministresParUtilisateur(Utilisateur utilisateur) {
-//        return utilisateur.getProjetsAdministres(); // Assuming bidirectional relationship
-//    }
-
-    /**
      * Obtenir un utilisateur par ID
      */
     public Optional<Utilisateur> getUtilisateurById(Long id) {
         return utilisateurRepository.findById(id);
+    }
+
+    /**
+     * Obtenir un utilisateur par ID - version qui lance une exception si non trouvé
+     * Pour compatibilité avec le controller
+     */
+    public Utilisateur findUtilisateurById(Long id) {
+        return utilisateurRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Utilisateur non trouvé avec l'ID: " + id));
     }
 
     /**
@@ -218,7 +198,6 @@ public class UtilisateurService {
      * verifier si admin
      */
     public List<Utilisateur> getAllUtilisateurs() {
-
         return utilisateurRepository.findAll();
     }
 
@@ -226,28 +205,9 @@ public class UtilisateurService {
      * Supprimer un utilisateur
      */
     public void supprimerUtilisateur(Utilisateur utilisateur) {
-        // Retirer l'utilisateur de tous ses projets avant suppression
-//        if (utilisateur.getProjets() != null) {
-//            for (Projet projet : utilisateur.getProjets()) {
-//                projet.getMembres().remove(utilisateur);
-//                projet.getAdmins().remove(utilisateur);
-//                projet.getDemandeursEnAttente().remove(utilisateur);
-//
-//                // Si c'est l'admin principal, il faut gérer la succession
-//                if (projet.getAdmin() != null && projet.getAdmin().equals(utilisateur)) {
-//                    // Logique pour assigner un nouvel admin principal
-//                    if (!projet.getAdmins().isEmpty()) {
-//                        projet.setAdmin(projet.getAdmins().iterator().next());
-//                    } else {
-//                        projet.setAdmin(null);
-//                    }
-//                }
-//                projetRepesitory.save(projet);
-//            }
-//        }
-
         utilisateurRepository.delete(utilisateur);
     }
+
     public Utilisateur saveUtilisateur(Utilisateur utilisateur) {
         return utilisateurRepository.save(utilisateur);
     }
