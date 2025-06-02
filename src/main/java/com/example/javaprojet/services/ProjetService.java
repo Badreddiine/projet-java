@@ -5,6 +5,7 @@ import com.example.javaprojet.entity.Utilisateur;
 import com.example.javaprojet.enums.StatutProjet;
 import com.example.javaprojet.repo.ProjetRepesitory;
 import com.example.javaprojet.repo.UtilisateurRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -191,7 +192,7 @@ public class ProjetService {
         projetRepository.save(projet);
     }
 
-    @Transactional
+
     public void changerAdminPrincipal(Long projetId, Long nouvelAdminId) {
         Projet projet = projetRepository.findById(projetId).orElseThrow(() -> new RuntimeException("Projet non trouvé"));
         Utilisateur nouvelAdmin = utilisateurRepository.findById(nouvelAdminId).orElseThrow(() -> new RuntimeException("Nouvel admin non trouvé"));
@@ -217,7 +218,7 @@ public class ProjetService {
         return projet.getDemandeursEnAttente();
     }
 
-    @Transactional
+
     public void traiterDemandeAdhesion(Long projetId, Long utilisateurId, boolean accepter) {
         Projet projet = projetRepository.findById(projetId).orElseThrow(() -> new RuntimeException("Projet non trouvé"));
         Utilisateur utilisateur = utilisateurRepository.findById(utilisateurId).orElseThrow(() -> new RuntimeException("Utilisateur non trouvé"));
@@ -269,7 +270,7 @@ public class ProjetService {
         return stats;
     }
 
-    @Transactional
+
     public void supprimerProjet(Long projetId) {
         Projet projet = projetRepository.findById(projetId).orElseThrow(() -> new RuntimeException("Projet non trouvé"));
         projet.getMembres().clear();
@@ -287,5 +288,31 @@ public class ProjetService {
     public boolean estAdminPrincipal(Long projetId, Long utilisateurId) {
         Projet projet = projetRepository.findById(projetId).orElseThrow(() -> new RuntimeException("Projet non trouvé"));
         return projet.getAdmin() != null && projet.getAdmin().getId().equals(utilisateurId);
+    }
+    /**
+     * Obtenir un projet par ID - version qui lance une exception si non trouvé
+     * Pour compatibilité avec le controller
+     */
+    public Projet findProjetById(Long id) {
+        return projetRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Projet non trouvé avec l'ID: " + id));
+    }
+
+
+    /**
+     * Sauvegarder un projet
+     */
+    public Projet saveProjet(Projet projet) {
+        return projetRepository.save(projet);
+    }
+
+
+
+
+    /**
+     * Supprimer un projet par entité
+     */
+    public void supprimerProjet(Projet projet) {
+        projetRepository.delete(projet);
     }
 }

@@ -18,6 +18,7 @@ public class CalendrierDTO {
 
     private Long proprietaire;
 
+
     public CalendrierDTO(Calendrier calendrier) {
         setId(calendrier.getId());
         setNom(calendrier.getNom());

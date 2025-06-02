@@ -5,7 +5,24 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="86675a6c-74a8-4579-b524-6eb5b9873711" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/Controller/CalendrierController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/Controller/ChatController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/Controller/EvenementController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/Controller/SalleDiscussionController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/services/CalendrierService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/services/EvenementService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/services/GroupeService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/services/SalleDiscussionService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/dto/CalendrierDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/dto/CalendrierDTO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/dto/MessageDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/dto/MessageDTO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/entity/Message.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/entity/Message.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/services/ProjetService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/services/ProjetService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/services/UtilisateurService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/services/UtilisateurService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/example/javaprojet/dto/CalendrierDTO.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/example/javaprojet/dto/CalendrierDTO.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/example/javaprojet/dto/MessageDTO$MessageDTOBuilder.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/example/javaprojet/dto/MessageDTO$MessageDTOBuilder.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/example/javaprojet/dto/MessageDTO.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/example/javaprojet/dto/MessageDTO.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/example/javaprojet/entity/Message.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/example/javaprojet/entity/Message.class" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -63,6 +80,11 @@
     ]
   }
 }</component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\badre\IdeaProjects\projet-java\src\main\java\com\example\javaprojet\Controller" />
+    </key>
+  </component>
   <component name="RunManager">
     <configuration name="JavaProjetApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
       <module name="java-projet" />
@@ -90,7 +112,7 @@
       <workItem from="1748646648859" duration="27295000" />
       <workItem from="1748742161399" duration="15056000" />
       <workItem from="1748816722821" duration="6119000" />
-      <workItem from="1748871370944" duration="1929000" />
+      <workItem from="1748871370944" duration="7257000" />
     </task>
     <servers />
   </component>
