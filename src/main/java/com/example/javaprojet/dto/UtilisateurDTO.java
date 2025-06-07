@@ -4,14 +4,15 @@ import com.example.javaprojet.entity.Utilisateur;
 import com.example.javaprojet.enums.RoleType;
 import com.example.javaprojet.enums.RoleSecondaire;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.Date;
+import java.util.List;
+import java.util.Set;
 
 @Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -27,9 +28,6 @@ public class UtilisateurDTO {
     private boolean estEnLigne;
     private boolean estConnecte;
     private Date derniereConnexion;
-
-    // Security-related fields
-    @JsonIgnore // Don't expose password in JSON responses
     private String motDePasse;
     private RoleType role;
     private RoleSecondaire roleSecondaire;
@@ -38,73 +36,81 @@ public class UtilisateurDTO {
     private String providerId;
     private String provider;
 
-    @JsonIgnore
+
     private String refreshToken;
 
-    // Date tracking
     private Date dateInscription;
     private Date dateCreation;
     private Date dateModification;
+    private Long projetId;    // ID du projet concerné
+    private Long adminId;
 
-    // Constructeur principal : Entité -> DTO
+
+
     public UtilisateurDTO(Utilisateur utilisateur) {
-        setId(utilisateur.getId());
-        setIdentifiant(utilisateur.getIdentifiant());
-        setNom(utilisateur.getNom());
-        setPrenom(utilisateur.getPrenom());
-        setEmail(utilisateur.getEmail());
-        setMotDePasse(utilisateur.getMotDePasse());
-        setPhotoProfile(utilisateur.getPhotoProfile());
-        setAvatar(utilisateur.getAvatar());
-        setActif(utilisateur.isActif());
-        setEstConnecte(utilisateur.isEstConnecte());
-        setEstEnLigne(utilisateur.isEstEnLigne());
-        setDerniereConnexion(utilisateur.getDerniereConnexion());
-        setRole(utilisateur.getRole());
-        setRoleSecondaire(utilisateur.getRoleSecondaire());
-        setDateInscription(utilisateur.getDateInscription());
-        setProviderId(utilisateur.getProviderId());
-        setProvider(utilisateur.getProvider());
-        setRefreshToken(utilisateur.getRefreshToken());
+      setId(utilisateur.getId());
+      setIdentifiant(utilisateur.getIdentifiant());
+      setNom(utilisateur.getNom());
+      setPrenom(utilisateur.getPrenom());
+      setEmail(utilisateur.getEmail());
+      setPhotoProfile(utilisateur.getPhotoProfile());
+      setAvatar(utilisateur.getAvatar());
+      setActif(utilisateur.isActif());
+      setEstEnLigne(utilisateur.isEstEnLigne());
+      setEstConnecte(utilisateur.isEstConnecte());
+      setDerniereConnexion(utilisateur.getDerniereConnexion());
+      setMotDePasse(utilisateur.getMotDePasse());
+      setRole(utilisateur.getRole());
+      setRoleSecondaire(utilisateur.getRoleSecondaire());
+      setProviderId(utilisateur.getProviderId());
+      setProvider(utilisateur.getProvider());
+      setRefreshToken(utilisateur.getRefreshToken());
+      setDateInscription(utilisateur.getDateInscription());
+
+
 
         // Mapper dateInscription vers dateCreation
         if (utilisateur.getDateInscription() != null) {
-            setDateCreation(utilisateur.getDateInscription());
+            this.dateCreation = utilisateur.getDateInscription();
         }
     }
 
-    // Constructor for creating user with password (for registration)
-
-
     // Constructor for OAuth2 registration
     public UtilisateurDTO(String nom, String prenom, String email, String provider, String providerId) {
-        setNom(nom);
-        setPrenom(prenom);
-        setEmail(email);
-        setProvider(provider);
-        setProviderId(providerId);
-        setRole(RoleType.GUEST);
-        setRoleSecondaire(RoleSecondaire.GUESS);
-        setEstEnLigne(false);
-        setEstConnecte(false);
-        setActif(true);
-        setDateCreation(new Date());
-        setDateInscription(new Date());
+        this.nom = nom;
+        this.prenom = prenom;
+        this.email = email;
+        this.provider = provider;
+        this.providerId = providerId;
+        this.role = RoleType.GUEST;
+        this.roleSecondaire = RoleSecondaire.GUESS;
+        this.estEnLigne = false;
+        this.estConnecte = false;
+        this.actif = true;
+        this.dateCreation = new Date();
+        this.dateInscription = new Date();
     }
 
     // Constructor for basic user creation
     public UtilisateurDTO(String identifiant, String nom, String prenom, String email) {
-        setIdentifiant(identifiant);
-        setNom(nom);
-        setPrenom(prenom);
-        setEmail(email);
-        setRole(RoleType.GUEST);
-        setRoleSecondaire(RoleSecondaire.GUESS);
-        setEstEnLigne(false);
-        setEstConnecte(false);
-        setActif(true);
-        setDateCreation(new Date());
-        setDateInscription(new Date());
+        this.identifiant = identifiant;
+        this.nom = nom;
+        this.prenom = prenom;
+        this.email = email;
+        this.role = RoleType.GUEST;
+        this.roleSecondaire = RoleSecondaire.GUESS;
+        this.estEnLigne = false;
+        this.estConnecte = false;
+        this.actif = true;
+        this.dateCreation = new Date();
+        this.dateInscription = new Date();
+    }
+
+    // **CONSTRUCTEUR POUR LES OPERATIONS DE PROJET**
+    public UtilisateurDTO(Long id, Long projetId, Long adminId) {
+        this.id = id;
+        this.projetId = projetId;
+        this.adminId = adminId;
     }
 
     // Helper method to check if password is provided (for updates)
@@ -132,8 +138,6 @@ public class UtilisateurDTO {
         return RoleType.GUEST.equals(role);
     }
 
-
-
     // Helper method to check if user is active and connected
     public boolean isActiveAndConnected() {
         return actif && estConnecte;
@@ -159,33 +163,43 @@ public class UtilisateurDTO {
 
     // Method to update connection status
     public void setConnected(boolean connected) {
-        setEstConnecte(connected);
-        setEstEnLigne(connected);
+        this.estConnecte = connected;
+        this.estEnLigne = connected;
         if (connected) {
-            setDerniereConnexion(new Date());
+            this.derniereConnexion = new Date();
         }
     }
 
-    // Method to prepare for JSON serialization (security)
-    public UtilisateurDTO forJsonResponse() {
-        UtilisateurDTO dto = new UtilisateurDTO();
-        dto.setId(this.id);
-        dto.setIdentifiant(this.identifiant);
-        dto.setNom(this.nom);
-        dto.setPrenom(this.prenom);
-        dto.setEmail(this.email);
-        dto.setAvatar(this.avatar);
-        dto.setActif(this.actif);
-        dto.setEstEnLigne(this.estEnLigne);
-        dto.setEstConnecte(this.estConnecte);
-        dto.setDerniereConnexion(this.derniereConnexion);
-        dto.setRole(this.role);
-        dto.setRoleSecondaire(this.roleSecondaire);
-        dto.setProvider(this.provider);
-        dto.setDateCreation(this.dateCreation);
-        dto.setDateModification(this.dateModification);
-        // Ne pas inclure: motDePasse, photoProfile, providerId, refreshToken
-        return dto;
+//    // Method to prepare for JSON serialization (security)
+//    public UtilisateurDTO forJsonResponsea {
+//        UtilisateurDTO dto = new UtilisateurDTO();
+//        dto.id = this.id;
+//        dto.identifiant = this.identifiant;
+//        dto.nom = this.nom;
+//        dto.prenom = this.prenom;
+//        dto.email = this.email;
+//        dto.avatar = this.avatar;
+//        dto.actif = this.actif;
+//        dto.estEnLigne = this.estEnLigne;
+//        dto.estConnecte = this.estConnecte;
+//        dto.derniereConnexion = this.derniereConnexion;
+//        dto.role = this.role;
+//        dto.roleSecondaire = this.roleSecondaire;
+//        dto.provider = this.provider;
+//        dto.dateCreation = this.dateCreation;
+//        dto.dateModification = this.dateModification;
+//        // Ne pas inclure: motDePasse, photoProfile, providerId, refreshToken
+//        return dto;
+//    }
+
+    // **METHODE POUR VALIDATION DES CHAMPS PROJET**
+    public boolean isValidForProjectOperation() {
+        return id != null && projetId != null;
+    }
+
+    // **METHODE POUR VALIDATION DES OPERATIONS ADMIN**
+    public boolean isValidForAdminOperation() {
+        return isValidForProjectOperation() && adminId != null;
     }
 
     @Override
@@ -203,8 +217,11 @@ public class UtilisateurDTO {
                 ", estEnLigne=" + estEnLigne +
                 ", provider='" + provider + '\'' +
                 ", dateCreation=" + dateCreation +
+                ", projetId=" + projetId +
+                ", adminId=" + adminId +
                 '}';
     }
+
     public void setConnecte(boolean connecte) {
         this.estConnecte = connecte;
         this.estEnLigne = connecte;

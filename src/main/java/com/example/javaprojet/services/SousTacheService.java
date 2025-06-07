@@ -1,10 +1,10 @@
 package com.example.javaprojet.services;
 
+import com.example.javaprojet.dto.SousTacheDTO;
 import com.example.javaprojet.entity.SousTache;
-import com.example.javaprojet.entity.Tache;
-import com.example.javaprojet.repo.SousTacheRepesitory;
+import com.example.javaprojet.repo.SousTacheRepository;
 import jakarta.transaction.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -12,10 +12,11 @@ import java.util.Optional;
 
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class SousTacheService {
 
-    @Autowired
-    private SousTacheRepesitory sousTacheRepository;
+
+    private SousTacheRepository sousTacheRepository;
 
     /**
      * methode pour cree une sous tache
@@ -39,11 +40,9 @@ public class SousTacheService {
             SousTache sousTache = sousTacheExistante.get();
             sousTache.setTitre(sousTacheModifiee.getTitre());
             sousTache.setDescription(sousTacheModifiee.getDescription());
-            sousTache.setTags(sousTacheModifiee.getTags());
             sousTache.setDateDebut(sousTacheModifiee.getDateDebut());
             sousTache.setDateFin(sousTacheModifiee.getDateFin());
             sousTache.setEtat(sousTacheModifiee.getEtat());
-            sousTache.setEstTerminee(sousTacheModifiee.isEstTerminee());
             return sousTacheRepository.save(sousTache);
         } else {
             throw new RuntimeException("Sous-tâche non trouvée avec l'ID : " + id);
@@ -51,13 +50,16 @@ public class SousTacheService {
     }
 
     /**
-     * 
-     * @param id
+     * suorimer une soustache
+     * @param id recuperer dans lle cintroleur a partir de dto
      */
     public void supprimerSousTache(Long id) {
         sousTacheRepository.deleteById(id);
     }
-
+    /**
+     * reccuprer   une soustache  par sons id
+     * @param id recuperer dans lle cintroleur a partir de dto
+     */
     public SousTache recupererSousTacheParId(Long id) {
         Optional<SousTache> sousTache = sousTacheRepository.findById(id);
         return sousTache.orElseThrow(() -> new RuntimeException("Sous-tâche non trouvée avec l'ID : " + id));
@@ -67,32 +69,27 @@ public class SousTacheService {
         return sousTacheRepository.findAll();
     }
 
-    public List<SousTache> recupererSousTachesParTache(Long tacheId) {
-        return sousTacheRepository.findByTache_Id(tacheId);
-    }
 
+    /**
+     * recuperer sous tache par sons etas por admine de projet
+     * @param etat
+     * @return
+     */
     public List<SousTache> recupererSousTachesParEtat(String etat) {
         return sousTacheRepository.findByEtat(etat);
     }
 
-    @Transactional
+    /**
+     * methode pour changer etat par user
+     * @param id recuperer apartire de dto dans controlleur
+     * @param nouvelEtat chaien de cararcter qui sera comme trois champs dans front end
+     * @return
+     */
     public SousTache changerEtatSousTache(Long id, String nouvelEtat) {
         Optional<SousTache> sousTacheExistante = sousTacheRepository.findById(id);
         if (sousTacheExistante.isPresent()) {
             SousTache sousTache = sousTacheExistante.get();
             sousTache.setEtat(nouvelEtat);
-            return sousTacheRepository.save(sousTache);
-        } else {
-            throw new RuntimeException("Sous-tâche non trouvée avec l'ID : " + id);
-        }
-    }
-
-    @Transactional
-    public SousTache marquerCommeTerminee(Long id, boolean estTerminee) {
-        Optional<SousTache> sousTacheExistante = sousTacheRepository.findById(id);
-        if (sousTacheExistante.isPresent()) {
-            SousTache sousTache = sousTacheExistante.get();
-            sousTache.setEstTerminee(estTerminee);
             return sousTacheRepository.save(sousTache);
         } else {
             throw new RuntimeException("Sous-tâche non trouvée avec l'ID : " + id);

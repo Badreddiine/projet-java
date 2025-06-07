@@ -1,9 +1,15 @@
 package com.example.javaprojet.services;
 
 import com.example.javaprojet.dto.CalendrierDTO;
+import com.example.javaprojet.dto.UtilisateurDTO;
 import com.example.javaprojet.entity.Calendrier;
+import com.example.javaprojet.entity.Utilisateur;
 import com.example.javaprojet.repo.CalendrierRepository;
+import com.example.javaprojet.repo.UtilisateurRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataAccessException;
 import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,18 +21,64 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @Transactional
+@Slf4j
 public class CalendrierService {
     private final CalendrierRepository calendrierRepository;
+    private final UtilisateurRepository utilisateurRepository;
 
     /**
      * Méthode pour créer un calendrier
-     * @param calendrierDTO le calendrier qui vient du front-end
+     * @param dto le calendrier qui vient du front-end
      * @return CalendrierDTO l'objet calendrier créé converti en DTO
      */
-    public CalendrierDTO createCalendrier(CalendrierDTO calendrierDTO) {
-        Calendrier calendrier = new Calendrier(calendrierDTO);
-        Calendrier savedCalendrier = calendrierRepository.save(calendrier);
-        return new CalendrierDTO(savedCalendrier);
+    public CalendrierDTO createCalendrier(CalendrierDTO dto, Long userId) {
+        log.info("Creating calendrier for user ID: {}", userId);
+
+        try {
+            // Validate input
+            if (dto == null) {
+                throw new IllegalArgumentException("CalendrierDTO cannot be null");
+            }
+            if (userId == null) {
+                throw new IllegalArgumentException("User ID cannot be null");
+            }
+
+            // Find user
+            Utilisateur proprietaire = utilisateurRepository.findById(userId)
+                    .orElseThrow(() -> {
+                        log.error("User not found with ID: {}", userId);
+                        return new EntityNotFoundException("Utilisateur non trouvé avec l'ID: " + userId);
+                    });
+
+            log.info("Found user: {}", proprietaire.getId());
+
+            // Create calendrier entity
+            Calendrier calendrier = new Calendrier();
+            calendrier.setNom(dto.getNom());
+            calendrier.setEstPartage(dto.isEstPartage());
+            calendrier.setProprietaire(proprietaire);
+
+            log.info("Saving calendrier: {}", calendrier.getNom());
+
+            // Save to database
+            Calendrier saved = calendrierRepository.save(calendrier);
+
+            log.info("Calendrier saved successfully with ID: {}", saved.getId());
+
+            // Convert to DTO and return
+            CalendrierDTO calendrierDTO = new CalendrierDTO(saved);
+            return calendrierDTO;
+
+        } catch (EntityNotFoundException e) {
+            log.error("Entity not found: {}", e.getMessage());
+            throw e;
+        } catch (DataAccessException e) {
+            log.error("Database error while creating calendrier: {}", e.getMessage());
+            throw new RuntimeException("Erreur lors de la sauvegarde du calendrier", e);
+        } catch (Exception e) {
+            log.error("Unexpected error creating calendrier", e);
+            throw new RuntimeException("Erreur inattendue lors de la création du calendrier", e);
+        }
     }
 
     /**
@@ -54,12 +106,12 @@ public class CalendrierService {
 
     /**
      * Méthode pour mettre à jour un calendrier
-     * @param id l'identifiant du calendrier à modifier
      * @param calendrierDTO les données modifiées du front-end sous format DTO
      * @return CalendrierDTO le calendrier mis à jour
      * @throws ChangeSetPersister.NotFoundException si le calendrier n'existe pas
      */
-    public CalendrierDTO updateCalendrier(Long id, CalendrierDTO calendrierDTO) throws ChangeSetPersister.NotFoundException {
+    public CalendrierDTO updateCalendrier( CalendrierDTO calendrierDTO) throws ChangeSetPersister.NotFoundException {
+        Long id = calendrierDTO.getId();
         Calendrier calendrier = calendrierRepository.findById(id)
                 .orElseThrow(ChangeSetPersister.NotFoundException::new);
 

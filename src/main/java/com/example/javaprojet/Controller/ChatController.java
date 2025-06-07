@@ -21,7 +21,6 @@ import java.util.Optional;
 
 @Controller
 @RequiredArgsConstructor
-@Slf4j
 public class ChatController {
 
     private final SimpMessagingTemplate messagingTemplate;
@@ -37,22 +36,19 @@ public class ChatController {
             // Validate and parse user ID
             Long userId = parseUserId(principal);
             if (userId == null) {
-                log.error("Invalid user ID from principal: {}", principal.getName());
                 return;
             }
 
             // Get user
-            Optional<Utilisateur> utilisateurOpt = utilisateurService.getUtilisateurById(userId);
-            if (utilisateurOpt.isEmpty()) {
-                log.error("User not found with ID: {}", userId);
+            Utilisateur utilisateur = utilisateurService.getUtilisateurById(userId);
+            if (utilisateur==null) {
                 return;
             }
-            Utilisateur utilisateur = utilisateurOpt.get();
+
 
             // Get chat room
             Optional<SalleDiscussion> salleOpt = salleDiscussionService.getSalleById(salleId);
             if (salleOpt.isEmpty()) {
-                log.error("Chat room not found with ID: {}", salleId);
                 return;
             }
 
@@ -60,7 +56,6 @@ public class ChatController {
 
             // Check if user is member of the room
             if (!salle.getMembres().contains(utilisateur)) {
-                log.warn("User {} is not a member of chat room {}", userId, salleId);
                 return;
             }
 
@@ -85,7 +80,6 @@ public class ChatController {
             messagingTemplate.convertAndSend(salle.getTopic(), sentMessageDTO);
 
         } catch (Exception e) {
-            log.error("Error sending message to room {}: {}", salleId, e.getMessage(), e);
         }
     }
 
@@ -93,7 +87,6 @@ public class ChatController {
         try {
             return Long.parseLong(principal.getName());
         } catch (NumberFormatException e) {
-            log.error("Failed to parse user ID from principal: {}", principal.getName());
             return null;
         }
     }

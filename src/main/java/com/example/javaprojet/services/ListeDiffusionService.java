@@ -1,11 +1,12 @@
 package com.example.javaprojet.services;
+import com.example.javaprojet.dto.EvenementDTO;
+import com.example.javaprojet.dto.ListDiffusionDTO;
 import com.example.javaprojet.entity.ListeDiffusion;
 import com.example.javaprojet.entity.Ressource;
 import com.example.javaprojet.entity.Utilisateur;
 import com.example.javaprojet.repo.ListeDiffusionRepository;
 import com.example.javaprojet.repo.RessourceRepository;
-import com.example.javaprojet.repo.UtilisateurRepesitory;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.example.javaprojet.repo.UtilisateurRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,36 +17,66 @@ import java.util.stream.Collectors;
 
 @Service
 @Transactional
+
 public class ListeDiffusionService {
 
     private final ListeDiffusionRepository listeDiffusionRepository;
-    private final UtilisateurRepesitory utilisateurRepository;
+    private final UtilisateurRepository utilisateurRepository;
     private final RessourceRepository ressourceRepository;
 
-    @Autowired
+
     public ListeDiffusionService(ListeDiffusionRepository listeDiffusionRepository,
-                                 UtilisateurRepesitory utilisateurRepository,
+                                 UtilisateurRepository utilisateurRepository,
                                  RessourceRepository ressourceRepository) {
         this.listeDiffusionRepository = listeDiffusionRepository;
         this.utilisateurRepository = utilisateurRepository;
         this.ressourceRepository = ressourceRepository;
     }
+
+    /**
+     * methode pour cree une liste de diffusion
+     * @param liste il faut le reccuperer de puis un dto dans le controlleur
+     * @return
+     */
     public ListeDiffusion create(ListeDiffusion liste) {
+
         return listeDiffusionRepository.save(liste);
     }
 
+    /**
+     * recuperer les liste de diffusion par id
+     * @param id  il faut reccuperer du dto
+     * @return
+     */
     @Transactional(readOnly = true)
-    public Optional<ListeDiffusion> findById(Long id) {
-        return listeDiffusionRepository.findById(id);
+    public Optional<ListDiffusionDTO> findById(Long id) {
+
+//        return listeDiffusionRepository.findById(id);
+        return listeDiffusionRepository.findById(id)
+                .map(ListDiffusionDTO::new);
     }
 
+    /**
+     * methode pour afficher tout les listes de diffusion
+     * @return
+     */
     @Transactional(readOnly = true)
-    public List<ListeDiffusion> findAll() {
-        return listeDiffusionRepository.findAll();
+    public List<ListDiffusionDTO> findAll() {
+
+        List<ListeDiffusion> l= listeDiffusionRepository.findAll();
+         return l.stream()
+                 .map(ListDiffusionDTO::new)
+                 .collect(Collectors.toList());
     }
 
-    //  UPDATE
-    public ListeDiffusion update(Long id, ListeDiffusion updated) {
+    /**
+     * methode pour faire mise a jour des listes de diffusion
+
+     * @param updated les donnes a recuperer
+     * @return
+     */
+    public ListDiffusionDTO update( ListDiffusionDTO updated) {
+        Long id =updated.getId();
         return listeDiffusionRepository.findById(id)
                 .map(existing -> {
                     existing.setNom(updated.getNom());
@@ -55,13 +86,16 @@ public class ListeDiffusionService {
                     existing.setDescription(updated.getDescription());
                     existing.setEstSysteme(updated.isEstSysteme());
                     existing.setProjet(updated.getProjet());
-                    existing.setAbonnes(updated.getAbonnes());
-                    return listeDiffusionRepository.save(existing);
+                  ListeDiffusion listeDiffusion =listeDiffusionRepository.save(existing);
+                  return new ListDiffusionDTO(listeDiffusion);
                 })
                 .orElseThrow(() -> new RuntimeException("Liste de diffusion non trouvée avec id " + id));
     }
 
-    //  DELETE
+    /**
+     * methode pour supprimer une liste de diffusion
+     * @param id le id il faut le reccupere dans le controlleur du dto
+     */
     public void delete(Long id) {
         if (!listeDiffusionRepository.existsById(id)) {
             throw new RuntimeException("Liste non trouvée avec id " + id);

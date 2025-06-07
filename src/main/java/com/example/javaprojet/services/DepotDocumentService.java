@@ -2,6 +2,7 @@ package com.example.javaprojet.services;
 
 
 
+import com.example.javaprojet.dto.DepotDocumentDTO;
 import com.example.javaprojet.entity.DepotDocument;
 import com.example.javaprojet.repo.DepotDocumentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,6 +36,7 @@ public class DepotDocumentService {
     // ✅ Lire un document par ID
     @Transactional(readOnly = true)
     public Optional<DepotDocument> findById(Long id) {
+
         return depotDocumentRepository.findById(id);
     }
 
@@ -44,6 +46,7 @@ public class DepotDocumentService {
      */
     @Transactional(readOnly = true)
     public List<DepotDocument> findAll() {
+
         return depotDocumentRepository.findAll();
     }
 

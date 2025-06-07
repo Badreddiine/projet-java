@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import com.example.javaprojet.entity.UserPrincipal;
 
 import java.security.Key;
+import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -22,8 +23,13 @@ public class JwtService {
     private JwtConfig jwtConfig;
 
     private Key getSigningKey() {
-        byte[] keyBytes = jwtConfig.getSecret().getBytes();
+        // Solution 1: Encoder en Base64
+        byte[] keyBytes = Base64.getDecoder().decode(jwtConfig.getSecret());
         return Keys.hmacShaKeyFor(keyBytes);
+
+        // OU Solution 2: Utiliser UTF-8 explicitement
+        // byte[] keyBytes = jwtConfig.getSecret().getBytes(StandardCharsets.UTF_8);
+        // return Keys.hmacShaKeyFor(keyBytes);
     }
 
     public String generateToken(Authentication authentication) {
@@ -68,16 +74,24 @@ public class JwtService {
     }
 
     private Claims extractAllClaims(String token) {
-        return Jwts.parserBuilder()
-                .setSigningKey(getSigningKey())
-                .build()
-                .parseClaimsJws(token)
-                .getBody();
+        try {
+            return Jwts.parserBuilder()
+                    .setSigningKey(getSigningKey())
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody();
+        } catch (JwtException e) {
+            throw new JwtException("Token JWT invalide : " + e.getMessage(), e);
+        }
     }
 
     public boolean validateToken(String token, UserDetails userDetails) {
-        final String username = extractUsername(token);
-        return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
+        try {
+            final String username = extractUsername(token);
+            return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
+        } catch (JwtException e) {
+            return false;
+        }
     }
 
     private boolean isTokenExpired(String token) {
