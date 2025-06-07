@@ -57,7 +57,7 @@ public class Reunion {
         setLienMeet(reuniondto.getLienMeet());
         setDuree(reuniondto.getDuree());
         setEstObligatoire(reuniondto.isEstObligatoire());
-        projet=null;
-        participants=new HashSet<>();
+         setProjet(reuniondto.getProjet());
+         setParticipants(new HashSet<>());
     }
 }

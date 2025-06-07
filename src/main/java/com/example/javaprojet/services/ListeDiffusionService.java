@@ -23,6 +23,7 @@ public class ListeDiffusionService {
     private final ListeDiffusionRepository listeDiffusionRepository;
     private final UtilisateurRepository utilisateurRepository;
     private final RessourceRepository ressourceRepository;
+    private  ProjetService projetService;
 
 
     public ListeDiffusionService(ListeDiffusionRepository listeDiffusionRepository,
@@ -85,7 +86,7 @@ public class ListeDiffusionService {
                     existing.setDateCreation(updated.getDateCreation());
                     existing.setDescription(updated.getDescription());
                     existing.setEstSysteme(updated.isEstSysteme());
-                    existing.setProjet(updated.getProjet());
+                    existing.setProjet(projetService.findProjetById(updated.getProjetId()));
                   ListeDiffusion listeDiffusion =listeDiffusionRepository.save(existing);
                   return new ListDiffusionDTO(listeDiffusion);
                 })
