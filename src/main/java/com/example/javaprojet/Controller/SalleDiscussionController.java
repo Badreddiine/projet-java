@@ -1,6 +1,9 @@
 package com.example.javaprojet.Controller;
 
+import com.example.javaprojet.dto.GroupeDTO;
+import com.example.javaprojet.dto.ProjetDTO;
 import com.example.javaprojet.dto.SalleDiscussionDTO;
+import com.example.javaprojet.dto.UtilisateurDTO;
 import com.example.javaprojet.entity.Groupe;
 import com.example.javaprojet.entity.Projet;
 import com.example.javaprojet.entity.SalleDiscussion;
@@ -34,8 +37,9 @@ public class SalleDiscussionController {
     /**
      * Récupérer une salle de discussion par son ID
      */
-    @GetMapping("/{id}")
-    public ResponseEntity<SalleDiscussionDTO> getSalleById(@PathVariable Long id) {
+    @GetMapping("/id")
+    public ResponseEntity<SalleDiscussionDTO> getSalleById(@PathVariable SalleDiscussionDTO salleDiscussionDTO) {
+        Long id = salleDiscussionDTO.getId();
         Optional<SalleDiscussion> salle = salleDiscussionService.getSalleById(id);
         return salle.map(s -> ResponseEntity.ok(new SalleDiscussionDTO(s)))
                 .orElse(ResponseEntity.notFound().build());
@@ -44,17 +48,16 @@ public class SalleDiscussionController {
     /**
      * Créer une salle de discussion pour un groupe
      */
-    @PostMapping("/groupe/{groupeId}")
+    @PostMapping("/groupe/groupeId")
     @Secured("ROLE_USER")
-    public ResponseEntity<SalleDiscussionDTO> creerSalleGroupe(
-            @PathVariable Long groupeId,
-            @RequestParam Long createurId,
-            @RequestBody @Valid SalleDiscussionDTO salleDiscussionDTO) {
+    public ResponseEntity<SalleDiscussionDTO> creerSalleGroupe(@RequestBody @Valid SalleDiscussionDTO salleDiscussionDTO) {
+        Long groupeId = salleDiscussionDTO.getGroupe().getId();
+        Long createurId= salleDiscussionDTO.getIdCreateur();
 
         try {
             // Récupération des entités depuis les services
             Groupe groupe = groupeService.findGroupeById(groupeId);
-            Utilisateur createur = utilisateurService.findUtilisateurById(createurId);
+            Utilisateur createur = utilisateurService.getUtilisateurById(createurId);
 
             SalleDiscussion salle = salleDiscussionService.creerSalleGroupe(
                     salleDiscussionDTO, groupe, createur);
@@ -71,17 +74,18 @@ public class SalleDiscussionController {
     /**
      * Créer une salle de discussion pour un projet
      */
-    @PostMapping("/projet/{projetId}")
+    @PostMapping("/projet/projetId")
     @Secured("ROLE_USER")
     public ResponseEntity<SalleDiscussionDTO> creerSalleProjet(
-            @PathVariable Long projetId,
-            @RequestParam Long createurId,
+
             @RequestBody @Valid SalleDiscussionDTO salleDiscussionDTO) {
+        Long projetId = salleDiscussionDTO.getProjet().getId();
+        Long createurId = salleDiscussionDTO.getIdCreateur();
 
         try {
             // Récupération des entités depuis les services
             Projet projet = projetService.findProjetById(projetId);
-            Utilisateur createur = utilisateurService.findUtilisateurById(createurId);
+            Utilisateur createur = utilisateurService.getUtilisateurById(createurId);
 
             SalleDiscussion salle = salleDiscussionService.creerSalleProjet(
                     salleDiscussionDTO, projet, createur);
@@ -101,11 +105,12 @@ public class SalleDiscussionController {
     @PostMapping("/generale")
     @Secured("ROLE_USER")
     public ResponseEntity<SalleDiscussionDTO> creerSalleGenerale(
-            @RequestParam Long createurId,
+//            @RequestParam Long createurId,
             @RequestBody @Valid SalleDiscussionDTO salleDiscussionDTO) {
+        Long createurId = salleDiscussionDTO.getIdCreateur();
 
         try {
-            Utilisateur createur = utilisateurService.findUtilisateurById(createurId);
+            Utilisateur createur = utilisateurService.getUtilisateurById(createurId);
 
             SalleDiscussion salle = salleDiscussionService.creerSalleGenerale(
                     salleDiscussionDTO, createur);
@@ -125,12 +130,14 @@ public class SalleDiscussionController {
     @PostMapping("/privee")
     @Secured("ROLE_USER")
     public ResponseEntity<SalleDiscussionDTO> creerSessionPrivee(
-            @RequestParam Long utilisateur1Id,
-            @RequestParam Long utilisateur2Id) {
+            @RequestParam UtilisateurDTO utilisateurDTO1,
+            @RequestParam UtilisateurDTO utilisateurDTO2) {
+        Long utilisateur1Id = utilisateurDTO1.getId();
+        Long utilisateur2Id = utilisateurDTO2.getId();
 
         try {
-            Utilisateur utilisateur1 = utilisateurService.findUtilisateurById(utilisateur1Id);
-            Utilisateur utilisateur2 = utilisateurService.findUtilisateurById(utilisateur2Id);
+            Utilisateur utilisateur1 = utilisateurService.getUtilisateurById(utilisateur1Id);
+            Utilisateur utilisateur2 = utilisateurService.getUtilisateurById(utilisateur2Id);
 
             SalleDiscussion salle = salleDiscussionService.creerSessionPrivee(
                     utilisateur1, utilisateur2);
@@ -149,7 +156,7 @@ public class SalleDiscussionController {
     @GetMapping("/utilisateur/{utilisateurId}")
     public ResponseEntity<List<SalleDiscussionDTO>> getSallesUtilisateur(@PathVariable Long utilisateurId) {
         try {
-            Utilisateur utilisateur = utilisateurService.findUtilisateurById(utilisateurId);
+            Utilisateur utilisateur = utilisateurService.getUtilisateurById(utilisateurId);
 
             List<SalleDiscussion> salles = salleDiscussionService.getSallesUtilisateur(utilisateur);
             List<SalleDiscussionDTO> sallesDTO = salles.stream()
@@ -168,7 +175,8 @@ public class SalleDiscussionController {
      * Récupérer les salles d'un projet
      */
     @GetMapping("/projet/{projetId}/salles")
-    public ResponseEntity<List<SalleDiscussionDTO>> getSallesProjet(@PathVariable Long projetId) {
+    public ResponseEntity<List<SalleDiscussionDTO>> getSallesProjet(@PathVariable ProjetDTO projetDTO) {
+        Long projetId = projetDTO.getId();
         try {
             List<SalleDiscussion> salles = salleDiscussionService.getSallesProjet(projetId);
             List<SalleDiscussionDTO> sallesDTO = salles.stream()
@@ -185,7 +193,8 @@ public class SalleDiscussionController {
      * Récupérer les salles d'un groupe
      */
     @GetMapping("/groupe/{groupeId}/salles")
-    public ResponseEntity<List<SalleDiscussionDTO>> getSallesGroupe(@PathVariable Long groupeId) {
+    public ResponseEntity<List<SalleDiscussionDTO>> getSallesGroupe(@PathVariable GroupeDTO groupeDTO) {
+        Long groupeId = groupeDTO.getId();
         try {
             List<SalleDiscussion> salles = salleDiscussionService.getSallesGroupe(groupeId);
             List<SalleDiscussionDTO> sallesDTO = salles.stream()
@@ -204,8 +213,10 @@ public class SalleDiscussionController {
     @PostMapping("/{salleId}/membres/{utilisateurId}")
     @Secured("ROLE_USER")
     public ResponseEntity<Void> ajouterUtilisateur(
-            @PathVariable Long salleId,
-            @PathVariable Long utilisateurId) {
+            @PathVariable SalleDiscussionDTO salleDTO,
+            @PathVariable UtilisateurDTO utilisateurDTO) {
+        Long utilisateurId = utilisateurDTO.getId();
+        Long salleId = salleDTO.getId();
 
         try {
             Optional<SalleDiscussion> salleOpt = salleDiscussionService.getSalleById(salleId);
@@ -213,7 +224,7 @@ public class SalleDiscussionController {
                 return ResponseEntity.notFound().build();
             }
 
-            Utilisateur utilisateur = utilisateurService.findUtilisateurById(utilisateurId);
+            Utilisateur utilisateur = utilisateurService.getUtilisateurById(utilisateurId);
 
             salleDiscussionService.ajouterUtilisateur(salleOpt.get(), utilisateur);
             return ResponseEntity.ok().build();
@@ -230,8 +241,10 @@ public class SalleDiscussionController {
     @DeleteMapping("/{salleId}/membres/{utilisateurId}")
     @Secured("ROLE_USER")
     public ResponseEntity<Void> supprimerUtilisateur(
-            @PathVariable Long salleId,
-            @PathVariable Long utilisateurId) {
+            @PathVariable SalleDiscussionDTO salleDTO,
+            @PathVariable UtilisateurDTO utilisateurDTO) {
+        Long utilisateurId = utilisateurDTO.getId();
+        Long salleId = salleDTO.getId();
 
         try {
             Optional<SalleDiscussion> salleOpt = salleDiscussionService.getSalleById(salleId);
@@ -239,7 +252,7 @@ public class SalleDiscussionController {
                 return ResponseEntity.notFound().build();
             }
 
-            Utilisateur utilisateur = utilisateurService.findUtilisateurById(utilisateurId);
+            Utilisateur utilisateur = utilisateurService.getUtilisateurById(utilisateurId);
 
             salleDiscussionService.supprimerUtilisateur(salleOpt.get(), utilisateur);
             return ResponseEntity.ok().build();
@@ -255,7 +268,8 @@ public class SalleDiscussionController {
      */
     @DeleteMapping("/{salleId}")
     @Secured("ROLE_ADMIN")
-    public ResponseEntity<Void> supprimerSalle(@PathVariable Long salleId) {
+    public ResponseEntity<Void> supprimerSalle(@PathVariable SalleDiscussionDTO salleDTO) {
+        Long salleId = salleDTO.getId();
         try {
             salleDiscussionService.supprimerSalle(salleId);
             return ResponseEntity.noContent().build();

@@ -11,6 +11,9 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.Optional;
+
 /**
  * @author $ {USERS}
  **/
@@ -87,7 +90,8 @@ public class GroupeService {
     /**
      * Obtenir un groupe par ID - version qui retourne Optional
      */
-    public java.util.Optional<Groupe> getGroupeById(Long id) {
+    public Optional<Groupe> getGroupeById(Long id) {
+
         return groupeRepository.findById(id);
     }
 
@@ -101,7 +105,15 @@ public class GroupeService {
     /**
      * Obtenir tous les groupes
      */
-    public java.util.List<Groupe> getAllGroupes() {
+    public List<Groupe> getAllGroupes() {
         return groupeRepository.findAll();
     }
+    public Groupe getById(Long id) {
+        Groupe groupe = groupeRepository.getGroupeById(id);
+        if (groupe == null) {
+            throw new EntityNotFoundException("Groupe not found with id: " + id);
+        }
+        return groupe;
+    }
+
 }

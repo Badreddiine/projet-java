@@ -46,7 +46,7 @@ public class Calendrier {
         setId(calendrierDTO.getId());
         setNom(calendrierDTO.getNom());
         setEstPartage(calendrierDTO.isEstPartage());
-        setProprietaire(null);
+        setProprietaire(calendrierDTO.getProprietaire());
         setEvenements(new HashSet<>());
         setUtilisateursPartages(new HashSet<>());
     }

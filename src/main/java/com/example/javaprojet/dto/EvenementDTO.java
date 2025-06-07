@@ -1,11 +1,15 @@
 package com.example.javaprojet.dto;
 
 import com.example.javaprojet.entity.Evenement;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.Date;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class EvenementDTO {
 
     private Long id;

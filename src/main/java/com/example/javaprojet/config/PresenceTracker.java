@@ -1,7 +1,11 @@
 package com.example.javaprojet.config;
 
+import com.example.javaprojet.dto.UtilisateurDTO;
 import com.example.javaprojet.entity.Utilisateur;
+import com.example.javaprojet.repo.UtilisateurRepository;
 import com.example.javaprojet.services.UtilisateurService;
+import jakarta.persistence.EntityNotFoundException;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -16,10 +20,19 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Component
 @Slf4j
+
 public class PresenceTracker {
 
     private final UtilisateurService utilisateurService;
     private final SimpMessagingTemplate messagingTemplate;
+
+    private  UtilisateurRepository utilisateurRepository;
+
+    public PresenceTracker(UtilisateurService utilisateurService, SimpMessagingTemplate messagingTemplate, UtilisateurRepository utilisateurRepository) {
+        this.utilisateurService = utilisateurService;
+        this.messagingTemplate = messagingTemplate;
+        this.utilisateurRepository = utilisateurRepository;
+    }
 
     // Map pour stocker les utilisateurs connectés et leur dernière activité
     private final Map<Long, Long> connectedUsers = new ConcurrentHashMap<>();
@@ -82,24 +95,27 @@ public class PresenceTracker {
 
     private void updateUserStatus(Long userId, boolean connected) {
         try {
-            Optional<Utilisateur> utilisateurOpt = utilisateurService.getUtilisateurById(userId);
-            if (utilisateurOpt.isPresent()) {
-                Utilisateur utilisateur = utilisateurOpt.get();
+            try {
+                Utilisateur utilisateur = utilisateurService.getUtilisateurById(userId);
+//                Utilisateur utilisateur = utilisateurRepository.findById(userId)
+//                        .orElseThrow(() -> new EntityNotFoundException("Utilisateur non trouvé"));
+
                 utilisateur.setConnecte(connected);
                 utilisateur.setDerniereConnexion(new Date());
-                utilisateurService.saveUtilisateur(utilisateur); // or whatever your save method is called
+                utilisateurService.saveUtilisateur(utilisateur);
 
-                // Notifier les autres utilisateurs du changement de statut
                 messagingTemplate.convertAndSend("/topic/status", Map.of(
                         "userId", userId,
                         "status", connected ? "ONLINE" : "OFFLINE",
                         "timestamp", System.currentTimeMillis()
                 ));
-            } else {
+
+            } catch (EntityNotFoundException e) {
                 log.warn("Utilisateur avec ID {} non trouvé", userId);
             }
         } catch (Exception e) {
             log.error("Erreur lors de la mise à jour du statut de l'utilisateur {}: {}", userId, e.getMessage());
         }
     }
+
 }

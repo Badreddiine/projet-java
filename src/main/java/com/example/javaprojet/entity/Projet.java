@@ -74,7 +74,7 @@ public class Projet {
     private Set<Tache> taches = new HashSet<>();
 
     @JsonIgnore
-    @OneToMany(mappedBy = "projet", cascade = CascadeType.ALL,fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "projet", cascade = CascadeType.ALL,fetch = FetchType.EAGER)
     private Set<Reunion> reunions = new HashSet<>();
 
     @JsonIgnore
@@ -109,6 +109,12 @@ public class Projet {
         if (admin != null) {
             this.admins.add(admin);
         }
+        this.membres.add(admin);
+    }
+
+    public Utilisateur getMAinAdmin() {
+
+        return admin;
     }
 
     public Projet(ProjetDTO projetDTO) {

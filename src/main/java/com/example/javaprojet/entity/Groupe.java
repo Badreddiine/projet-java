@@ -1,12 +1,13 @@
 package com.example.javaprojet.entity;
+
+import com.example.javaprojet.dto.GroupeDTO;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.*;
+import lombok.*;
+
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
-
-import com.example.javaprojet.dto.GroupeDTO;
-import jakarta.persistence.*;
-import lombok.*;
-import net.minidev.json.annotate.JsonIgnore;
 
 @Entity
 @Data
@@ -22,12 +23,12 @@ public class Groupe {
     private String nom;
 
     private String description;
-
     private boolean estSysteme;
 
     @Temporal(TemporalType.TIMESTAMP)
     private Date dateCreation;
 
+    // Remove @JsonManagedReference, keep only @JsonIgnore to prevent circular references
     @JsonIgnore
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinTable(
@@ -37,8 +38,8 @@ public class Groupe {
     )
     private Set<Utilisateur> membres = new HashSet<>();
 
-    @JsonIgnore
-    @OneToMany(fetch = FetchType.LAZY,cascade = CascadeType.ALL)
+    @JsonIgnore  // Also ignore projets to avoid potential issues
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinColumn(name = "groupe_id")
     private Set<Projet> projets = new HashSet<>();
 
@@ -52,6 +53,3 @@ public class Groupe {
         setProjets(new HashSet<>());
     }
 }
-
-
-
