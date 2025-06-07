@@ -105,7 +105,7 @@ public class CalendrierController {
      * Mettre à jour un calendrier
      */
     @PutMapping
-    @Secured("ROLE_USER")
+//    @Secured({"ROLE_USER", "ROLE_ADMIN"})
     public ResponseEntity<CalendrierDTO> updateCalendrier(@RequestBody @Valid CalendrierDTO calendrierDTO) {
         Long id = calendrierDTO.getId();
         try {

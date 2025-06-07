@@ -4,6 +4,9 @@ import java.util.HashSet;
 import java.util.Set;
 
 import com.example.javaprojet.dto.TacheDTO;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -22,10 +25,10 @@ public class Tache {
     private String titre;
 
     private String description;
-
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSX")
     @Temporal(TemporalType.TIMESTAMP)
     private Date dateDebut;
-
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSX")
     @Temporal(TemporalType.TIMESTAMP)
     private Date dateFin;
 
@@ -38,6 +41,7 @@ public class Tache {
     private int notation;
 
     @JsonIgnore
+    @JsonIgnoreProperties({"taches", "admins", "admin", "reunions", "depotDocuments", "listesDiffusion", "groupe", "sallesDiscussion", "demandeursEnAttente", "mainAdmin"})
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_projet")
     private Projet projet;
@@ -47,22 +51,23 @@ public class Tache {
     private Set<SousTache> sousTaches = new HashSet<>();
 
     @JsonIgnore
+    @JsonBackReference
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_utilisateur")
     private Utilisateur assigneA;
-public Tache(TacheDTO tacheDTO) {
-    setTitre(tacheDTO.getTitre());
-    setDescription(tacheDTO.getDescription());
-    setDateDebut(tacheDTO.getDateDebut());
-    setDateFin(tacheDTO.getDateFin());
-    setPriorite(tacheDTO.getPriorite());
-    setDifficulte(tacheDTO.getDifficulte());
-    setEtat(tacheDTO.getEtat());
-    setNotation(tacheDTO.getNotation());
-    setProjet(tacheDTO.getProjet());
-    sousTaches=new HashSet<>();
-    assigneA=null;
-    projet=null;
-}
 
+    public Tache(TacheDTO tacheDTO) {
+        setTitre(tacheDTO.getTitre());
+        setDescription(tacheDTO.getDescription());
+        setDateDebut(tacheDTO.getDateDebut());
+        setDateFin(tacheDTO.getDateFin());
+        setPriorite(tacheDTO.getPriorite());
+        setDifficulte(tacheDTO.getDifficulte());
+        setEtat(tacheDTO.getEtat());
+        setNotation(tacheDTO.getNotation());
+        setProjet(tacheDTO.getProjet());
+        setAssigneA(tacheDTO.getAssigneA());
+          setPriorite(tacheDTO.getPriorite());
+        setSousTaches(new HashSet<>());
+    }
 }

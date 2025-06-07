@@ -45,7 +45,6 @@ public class ListeDiffusion extends Ressource {
         setEstSysteme(listDiffusionDTO.isEstSysteme());
         setDescription(listDiffusionDTO.getDescription());
         setEstSysteme(listDiffusionDTO.isEstSysteme());
-        setProjet(listDiffusionDTO.getProjet());
         setAbonnes(new HashSet<>());
         setAbonnes(new HashSet<>());
     }

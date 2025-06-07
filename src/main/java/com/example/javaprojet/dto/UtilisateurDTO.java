@@ -36,7 +36,6 @@ public class UtilisateurDTO {
     private String providerId;
     private String provider;
 
-
     private String refreshToken;
 
     private Date dateInscription;
@@ -45,29 +44,25 @@ public class UtilisateurDTO {
     private Long projetId;    // ID du projet concerné
     private Long adminId;
 
-
-
     public UtilisateurDTO(Utilisateur utilisateur) {
-      setId(utilisateur.getId());
-      setIdentifiant(utilisateur.getIdentifiant());
-      setNom(utilisateur.getNom());
-      setPrenom(utilisateur.getPrenom());
-      setEmail(utilisateur.getEmail());
-      setPhotoProfile(utilisateur.getPhotoProfile());
-      setAvatar(utilisateur.getAvatar());
-      setActif(utilisateur.isActif());
-      setEstEnLigne(utilisateur.isEstEnLigne());
-      setEstConnecte(utilisateur.isEstConnecte());
-      setDerniereConnexion(utilisateur.getDerniereConnexion());
-      setMotDePasse(utilisateur.getMotDePasse());
-      setRole(utilisateur.getRole());
-      setRoleSecondaire(utilisateur.getRoleSecondaire());
-      setProviderId(utilisateur.getProviderId());
-      setProvider(utilisateur.getProvider());
-      setRefreshToken(utilisateur.getRefreshToken());
-      setDateInscription(utilisateur.getDateInscription());
-
-
+        setId(utilisateur.getId());
+        setIdentifiant(utilisateur.getIdentifiant());
+        setNom(utilisateur.getNom());
+        setPrenom(utilisateur.getPrenom());
+        setEmail(utilisateur.getEmail());
+        setPhotoProfile(utilisateur.getPhotoProfile());
+        setAvatar(utilisateur.getAvatar());
+        setActif(utilisateur.isActif());
+        setEstEnLigne(utilisateur.isEstEnLigne());
+        setEstConnecte(utilisateur.isEstConnecte());
+        setDerniereConnexion(utilisateur.getDerniereConnexion());
+        setMotDePasse(utilisateur.getMotDePasse());
+        setRole(utilisateur.getRole());
+        setRoleSecondaire(utilisateur.getRoleSecondaire());
+        setProviderId(utilisateur.getProviderId());
+        setProvider(utilisateur.getProvider());
+        setRefreshToken(utilisateur.getRefreshToken());
+        setDateInscription(utilisateur.getDateInscription());
 
         // Mapper dateInscription vers dateCreation
         if (utilisateur.getDateInscription() != null) {
@@ -169,28 +164,6 @@ public class UtilisateurDTO {
             this.derniereConnexion = new Date();
         }
     }
-
-//    // Method to prepare for JSON serialization (security)
-//    public UtilisateurDTO forJsonResponsea {
-//        UtilisateurDTO dto = new UtilisateurDTO();
-//        dto.id = this.id;
-//        dto.identifiant = this.identifiant;
-//        dto.nom = this.nom;
-//        dto.prenom = this.prenom;
-//        dto.email = this.email;
-//        dto.avatar = this.avatar;
-//        dto.actif = this.actif;
-//        dto.estEnLigne = this.estEnLigne;
-//        dto.estConnecte = this.estConnecte;
-//        dto.derniereConnexion = this.derniereConnexion;
-//        dto.role = this.role;
-//        dto.roleSecondaire = this.roleSecondaire;
-//        dto.provider = this.provider;
-//        dto.dateCreation = this.dateCreation;
-//        dto.dateModification = this.dateModification;
-//        // Ne pas inclure: motDePasse, photoProfile, providerId, refreshToken
-//        return dto;
-//    }
 
     // **METHODE POUR VALIDATION DES CHAMPS PROJET**
     public boolean isValidForProjectOperation() {

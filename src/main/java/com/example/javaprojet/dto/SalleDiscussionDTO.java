@@ -4,6 +4,7 @@ import com.example.javaprojet.entity.Groupe;
 import com.example.javaprojet.entity.Projet;
 import com.example.javaprojet.entity.SalleDiscussion;
 import com.example.javaprojet.enums.TypeSalle;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import java.util.Date;
@@ -23,7 +24,9 @@ public class SalleDiscussionDTO {
     private Date dateCreation;
 
     // Full objects (if needed for some use cases)
+    @JsonIgnore
     private Projet projet;
+    @JsonIgnore
     private Groupe groupe;
 
     // Additional fields for the mapper

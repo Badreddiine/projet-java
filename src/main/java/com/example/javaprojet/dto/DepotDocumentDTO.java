@@ -5,12 +5,16 @@ import com.example.javaprojet.entity.Groupe;
 import com.example.javaprojet.entity.Projet;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import net.minidev.json.annotate.JsonIgnore;
 
 import java.util.Date;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class DepotDocumentDTO {
 
     private Long id;
@@ -23,6 +27,7 @@ public class DepotDocumentDTO {
 
     private Date dateCreation;
     private boolean estPublic;
+    @JsonIgnore
     private Projet projet;
 
     public DepotDocumentDTO(DepotDocument depotDocument) {

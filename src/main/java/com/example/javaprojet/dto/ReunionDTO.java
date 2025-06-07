@@ -1,8 +1,15 @@
 package com.example.javaprojet.dto;
+import com.example.javaprojet.entity.Projet;
 import com.example.javaprojet.entity.Reunion;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.util.Date;
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class ReunionDTO {
 
 
@@ -17,6 +24,8 @@ public class ReunionDTO {
     private String lienMeet;
 
     private int duree;
+    @JsonIgnore
+    private Projet projet;
 
     private boolean estObligatoire;
     public ReunionDTO(Reunion reunion) {
@@ -27,6 +36,7 @@ public class ReunionDTO {
         setLienMeet(reunion.getLienMeet());
         setDuree(reunion.getDuree());
         setEstObligatoire(reunion.isEstObligatoire());
+        setProjet(reunion.getProjet());
 
     }
 

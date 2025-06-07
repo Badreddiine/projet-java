@@ -2,7 +2,9 @@ package com.example.javaprojet.Controller;
 
 import com.example.javaprojet.dto.ListDiffusionDTO;
 import com.example.javaprojet.entity.ListeDiffusion;
+import com.example.javaprojet.entity.Projet;
 import com.example.javaprojet.services.ListeDiffusionService;
+import com.example.javaprojet.services.ProjetService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -17,19 +19,30 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class ListeDiffusionController {
     private final ListeDiffusionService listeDiffusionService;
-
+    private final ProjetService projetService;
 
     @PostMapping
     public ResponseEntity<ListDiffusionDTO> createListeDiffusion(@RequestBody @Valid ListDiffusionDTO dto) {
-
         if (dto.getId() != null) {
             return ResponseEntity.status(HttpStatus.CONFLICT).build();
         }
-        ListeDiffusion listeDiffusi= new ListeDiffusion(dto);
-        ListeDiffusion listeDiffusionCreated=listeDiffusionService.create(listeDiffusi);
-        ListDiffusionDTO listeDiffusionDTO = new ListDiffusionDTO(listeDiffusionCreated);
-        return ResponseEntity.status(HttpStatus.CREATED).body(listeDiffusionDTO);
+
+        Projet projet = projetService.findProjetById(dto.getProjetId());
+
+
+        // Créer l'objet ListeDiffusion en injectant l'objet Projet attaché
+        ListeDiffusion liste = new ListeDiffusion();
+        liste.setNom(dto.getNom());
+        liste.setProjet(projet); // ✅ entité gérée
+
+        ListeDiffusion saved = listeDiffusionService.create(liste);
+
+        // Mapper vers DTO
+        ListDiffusionDTO responseDto = new ListDiffusionDTO(saved);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
     }
+
     @GetMapping("/{id}")
     public ResponseEntity<ListDiffusionDTO> getListeDiffusionById(@PathVariable ListDiffusionDTO dto) {
         long id = dto.getId();

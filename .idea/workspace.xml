@@ -5,46 +5,28 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="86675a6c-74a8-4579-b524-6eb5b9873711" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/Controller/AuthController.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/Controller/GroupeController.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/Controller/ListeDiffusionController.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/Controller/ProjetController.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/services/DepotDocumentService.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/services/ListeDiffusionService.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/services/ReunionService.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/services/SousTacheService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/Controller/ReunionController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/Controller/TacheController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/Controller/UtilisateurController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/services/TacheService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/Controller/CalendrierController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/Controller/CalendrierController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/Controller/ChatController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/Controller/ChatController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/Controller/EvenementController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/Controller/EvenementController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/Controller/SalleDiscussionController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/Controller/SalleDiscussionController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/JavaProjetApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/JavaProjetApplication.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/config/PresenceTracker.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/config/PresenceTracker.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/Controller/ListeDiffusionController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/Controller/ListeDiffusionController.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/config/SecurityConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/config/SecurityConfig.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/dto/CalendrierDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/dto/CalendrierDTO.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/dto/DepotDocumentDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/dto/DepotDocumentDTO.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/dto/EvenementDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/dto/EvenementDTO.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/dto/GroupeDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/dto/GroupeDTO.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/dto/ListDiffusionDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/dto/ListDiffusionDTO.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/dto/ProjetDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/dto/ProjetDTO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/dto/ReunionDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/dto/ReunionDTO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/dto/SalleDiscussionDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/dto/SalleDiscussionDTO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/dto/SousTacheDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/dto/SousTacheDTO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/dto/TacheDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/dto/TacheDTO.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/dto/UtilisateurDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/dto/UtilisateurDTO.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/entity/Calendrier.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/entity/Calendrier.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/entity/Groupe.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/entity/Groupe.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/entity/Projet.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/entity/Projet.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/entity/ProjetRole.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/entity/ProjetRole.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/entity/UserPrincipal.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/entity/UserPrincipal.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/entity/ListeDiffusion.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/entity/ListeDiffusion.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/entity/Reunion.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/entity/Reunion.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/entity/Tache.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/entity/Tache.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/entity/Utilisateur.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/entity/Utilisateur.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/repo/GroupeRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/repo/GroupeRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/repo/ProjetRepesitory.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/repo/ProjetRepesitory.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/security/JwtAuthenticationFilter.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/security/JwtAuthenticationFilter.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/security/JwtService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/security/JwtService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/services/AuthService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/services/AuthService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/services/CalendrierService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/services/CalendrierService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/services/EvenementService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/services/EvenementService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/services/GroupeService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/services/GroupeService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/services/ProjetService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/services/ProjetService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/services/UtilisateurService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/services/UtilisateurService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/application.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/services/ListeDiffusionService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/services/ListeDiffusionService.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -86,7 +68,7 @@
     "RequestMappingsPanelWidth1": "75",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.git.unshallow": "true",
-    "Spring Boot.JavaProjetApplication.executor": "Debug",
+    "Spring Boot.JavaProjetApplication.executor": "Run",
     "git-widget-placeholder": "v2",
     "ignore.virus.scanning.warn.message": "true",
     "last_opened_file_path": "C:/Users/badre/IdeaProjects/projet-java/pom.xml",
@@ -139,7 +121,7 @@
       <workItem from="1748975312467" duration="19603000" />
       <workItem from="1749211216939" duration="5173000" />
       <workItem from="1749217552337" duration="3060000" />
-      <workItem from="1749220870978" duration="35808000" />
+      <workItem from="1749220870978" duration="56394000" />
     </task>
     <servers />
   </component>

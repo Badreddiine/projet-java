@@ -5,6 +5,7 @@ import com.example.javaprojet.enums.RoleType;
 import com.example.javaprojet.enums.RoleSecondaire;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -63,6 +64,7 @@ public class Utilisateur {
 
     @Column(length = 1000)
     private String refreshToken;
+
     @JsonIgnore
     @JsonBackReference
     @ManyToMany(mappedBy = "membres", fetch = FetchType.LAZY)
@@ -87,6 +89,11 @@ public class Utilisateur {
     @JsonIgnore
     @OneToMany(mappedBy = "proprietaire", fetch = FetchType.LAZY)
     private Set<Calendrier> calendriers = new HashSet<>();
+
+    // CORRECTION: changé "utilisateur" par "assigneA" pour correspondre à la propriété dans Tache
+    @OneToMany(mappedBy = "assigneA", fetch = FetchType.LAZY)
+    @JsonManagedReference
+    private List<Tache> taches;
 
     public void setConnecte(boolean connecte) {
         this.estConnecte = connecte;
@@ -140,7 +147,7 @@ public class Utilisateur {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id); // Utilisez seulement l'ID pour le hash
+        return Objects.hash(id);
     }
 
     @Override
@@ -148,6 +155,6 @@ public class Utilisateur {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Utilisateur that = (Utilisateur) o;
-        return Objects.equals(id, that.id); // Comparez seulement par ID
+        return Objects.equals(id, that.id);
     }
 }
