@@ -9,7 +9,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
-@Data
+
 @Entity
 @Getter
 @Setter
@@ -47,6 +47,7 @@ public class Projet {
 
     @JsonIgnore
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+
     @JoinTable(
             name = "projet_utilisateur",
             joinColumns = @JoinColumn(name = "projet_id"),

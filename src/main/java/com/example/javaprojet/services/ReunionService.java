@@ -42,7 +42,9 @@ public class ReunionService {
         Projet projet = projetRepository.findById(projetId)
                 .orElseThrow(() -> new RuntimeException("Projet non trouvé avec id " + projetId));
         reunion.setProjet(projet);
-        return reunionRepository.save(reunion);
+        Reunion reunion1=reunionRepository.save(reunion);
+       reunion1.getProjet().getMembres().size();
+       return reunion1;
     }
 
     /**

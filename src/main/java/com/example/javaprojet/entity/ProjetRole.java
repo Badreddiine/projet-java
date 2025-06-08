@@ -3,17 +3,16 @@ package com.example.javaprojet.entity;
 import com.example.javaprojet.enums.RoleSecondaire;
 import com.example.javaprojet.enums.RoleType;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import net.minidev.json.annotate.JsonIgnore;
 
-@Data
+
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Getter
+@Setter
 public class ProjetRole {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

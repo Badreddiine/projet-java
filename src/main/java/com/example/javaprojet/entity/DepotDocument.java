@@ -8,7 +8,8 @@ import net.minidev.json.annotate.JsonIgnore;
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 @AllArgsConstructor
-@Data
+@Getter
+@Setter
 public class DepotDocument extends Ressource {
 
     private boolean estPublic;

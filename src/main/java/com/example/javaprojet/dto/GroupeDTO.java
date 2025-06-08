@@ -21,7 +21,7 @@ public class GroupeDTO {
         private String description;
         private boolean estSysteme;
         private Date dateCreation;
-        @JsonIgnore
+
         private List<UtilisateurDTO> membres; // Only include essential member info
 
         public GroupeDTO(Groupe groupe) {
