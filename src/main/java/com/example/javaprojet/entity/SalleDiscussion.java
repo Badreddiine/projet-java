@@ -10,7 +10,8 @@ import lombok.*;
 import net.minidev.json.annotate.JsonIgnore;
 
 @Entity
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder

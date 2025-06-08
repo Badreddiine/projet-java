@@ -14,6 +14,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.firewall.HttpFirewall;
+import org.springframework.security.web.firewall.StrictHttpFirewall;
 
 @Configuration
 @EnableWebSecurity
@@ -35,6 +37,24 @@ public class SecurityConfig {
     public SecurityConfig(JwtAuthenticationFilter jwtAuthFilter) {
         this.jwtAuthFilter = jwtAuthFilter;
     }
+    @Bean
+    public HttpFirewall customHttpFirewall() {
+        StrictHttpFirewall firewall = new StrictHttpFirewall();
+
+        // Available methods in StrictHttpFirewall:
+        firewall.setAllowUrlEncodedSlash(true);        // Permet %2F
+        firewall.setAllowUrlEncodedPercent(true);      // Permet %25
+        firewall.setAllowUrlEncodedPeriod(true);       // Permet %2E
+        firewall.setAllowBackSlash(true);              // Permet \
+        firewall.setAllowSemicolon(true);              // Permet ;
+        firewall.setAllowUrlEncodedCarriageReturn(true); // Permet %0D
+        firewall.setAllowUrlEncodedLineFeed(true);     // Permet %0A (newline)
+
+        // Pour autoriser les doubles slashes, utilisez:
+        firewall.setAllowUrlEncodedSlash(true);
+
+        return firewall;
+    }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -43,6 +63,7 @@ public class SecurityConfig {
                 .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
+//                        .requestMatchers("/api/reunions/**").permitAll()
                         // Autorise les endpoints Swagger sans authentification
                         .requestMatchers(SWAGGER_WHITELIST).permitAll()
                         .anyRequest().authenticated()
