@@ -5,26 +5,21 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="86675a6c-74a8-4579-b524-6eb5b9873711" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/.dockerignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.env.example" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Dockerfile" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/config/WebConfig.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/entity/MessageResponse.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources.local.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources.local.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources/672734ff-7a76-4855-916d-de530a9d08ec.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/672734ff-7a76-4855-916d-de530a9d08ec.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/Controller/ReunionController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/Controller/ReunionController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/Controller/AuthController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/Controller/AuthController.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/config/SecurityConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/config/SecurityConfig.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/dto/GroupeDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/dto/GroupeDTO.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/dto/ReunionDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/dto/ReunionDTO.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/entity/Calendrier.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/entity/Calendrier.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/entity/DepotDocument.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/entity/DepotDocument.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/entity/Evenement.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/entity/Evenement.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/entity/Groupe.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/entity/Groupe.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/entity/ListeDiffusion.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/entity/ListeDiffusion.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/entity/Projet.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/entity/Projet.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/entity/ProjetRole.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/entity/ProjetRole.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/entity/Ressource.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/entity/Ressource.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/entity/Reunion.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/entity/Reunion.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/entity/SalleDiscussion.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/entity/SalleDiscussion.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/entity/SousTache.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/entity/SousTache.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/entity/Tache.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/entity/Tache.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/dto/AuthRequestDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/dto/AuthRequestDTO.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/entity/Utilisateur.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/entity/Utilisateur.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/services/ReunionService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/services/ReunionService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/security/JwtAuthenticationFilter.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/javaprojet/security/JwtAuthenticationFilter.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/application.properties" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -65,16 +60,22 @@
     &quot;RequestMappingsPanelWidth0&quot;: &quot;75&quot;,
     &quot;RequestMappingsPanelWidth1&quot;: &quot;75&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
     &quot;Spring Boot.JavaProjetApplication.executor&quot;: &quot;Run&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;v2&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
     &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
     &quot;last_opened_file_path&quot;: &quot;C:/Users/badre/IdeaProjects/projet-java/pom.xml&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
     &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
     &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;project.structure.last.edited&quot;: &quot;Project&quot;,
+    &quot;project.structure.proportion&quot;: &quot;0.0&quot;,
+    &quot;project.structure.side.proportion&quot;: &quot;0.0&quot;,
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   },
   &quot;keyToStringList&quot;: {
@@ -100,8 +101,8 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-jdk-9823dce3aa75-fbdcb00ec9e3-intellij.indexing.shared.core-IU-251.23774.435" />
-        <option value="bundled-js-predefined-d6986cc7102b-f27c65a3e318-JavaScript-IU-251.23774.435" />
+        <option value="bundled-jdk-30f59d01ecdd-26cb7f24e5b0-intellij.indexing.shared.core-IU-253.29346.240" />
+        <option value="bundled-js-predefined-d6986cc7102b-9b0f141eb926-JavaScript-IU-253.29346.240" />
       </set>
     </attachedChunks>
   </component>
@@ -121,6 +122,9 @@
       <workItem from="1749217552337" duration="3060000" />
       <workItem from="1749220870978" duration="56394000" />
       <workItem from="1749334042692" duration="8920000" />
+      <workItem from="1767983907137" duration="305000" />
+      <workItem from="1767995910508" duration="9253000" />
+      <workItem from="1768010284800" duration="15555000" />
     </task>
     <servers />
   </component>

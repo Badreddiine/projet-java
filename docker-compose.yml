@@ -1,0 +1,141 @@
+services:
+  # Base de données PostgreSQL
+  postgres:
+    image: postgres:15-alpine
+    container_name: auth-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: "1234"
+      PGDATA: /var/lib/postgresql/data/pgdata
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init-scripts:/docker-entrypoint-initdb.d
+    networks:
+      - auth-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  # Application Spring Boot
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: auth-backend
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      # Configuration de la base de données
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/db
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: "1234"
+      SPRING_DATASOURCE_DRIVER_CLASS_NAME: org.postgresql.Driver
+
+      # Configuration JPA
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SPRING_JPA_SHOW_SQL: "false"
+      SPRING_JPA_DATABASE_PLATFORM: org.hibernate.dialect.PostgreSQLDialect
+      SPRING_JPA_OPEN_IN_VIEW: "false"
+
+      # Configuration JWT
+      JWT_SECRET: dGVzdC1zZWNyZXQtZm9yLWp3dC10b2tlbi1nZW5lcmF0aW9uLXdpdGgtaGFzaC0yNTYtYWxnb3JpdGhtLWFuZC1zZWN1cml0eQ==
+      JWT_EXPIRATION_MS: "86400000"
+      JWT_REFRESH_EXPIRATION_MS: "604800000"
+      JWT_HEADER: Authorization
+      JWT_PREFIX: "Bearer "
+
+      # Configuration OAuth2 (optionnel)
+      SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-your-google-client-id}
+      SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-your-google-client-secret}
+      SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GITHUB_CLIENT_ID: ${GITHUB_CLIENT_ID:-your-github-client-id}
+      SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GITHUB_CLIENT_SECRET: ${GITHUB_CLIENT_SECRET:-your-github-client-secret}
+
+      # Configuration Spring Boot
+      SPRING_PROFILES_ACTIVE: prod
+      SPRING_APPLICATION_NAME: auth-jwt-oauth2
+
+      # Configuration du serveur
+      SERVER_PORT: "8080"
+      SERVER_ERROR_INCLUDE_MESSAGE: always
+      SERVER_ERROR_INCLUDE_BINDING_ERRORS: always
+      SERVER_ERROR_INCLUDE_STACKTRACE: never
+      SERVER_ERROR_INCLUDE_EXCEPTION: "false"
+
+      # Configuration CORS
+      SPRING_WEB_CORS_ALLOWED_ORIGINS: http://localhost:3000,http://localhost:3001,http://localhost:5173
+      SPRING_WEB_CORS_ALLOWED_METHODS: GET,POST,PUT,DELETE,OPTIONS,PATCH
+      SPRING_WEB_CORS_ALLOWED_HEADERS: "*"
+      SPRING_WEB_CORS_ALLOW_CREDENTIALS: "true"
+      SPRING_WEB_CORS_MAX_AGE: "3600"
+
+      # Logging
+      LOGGING_LEVEL_ROOT: INFO
+      LOGGING_LEVEL_COM_EXAMPLE_JAVAPROJET: DEBUG
+      LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_WEB: DEBUG
+      LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_SECURITY: DEBUG
+      LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_WEB_CORS: DEBUG
+
+      # DevTools désactivé
+      SPRING_DEVTOOLS_RESTART_ENABLED: "false"
+      SPRING_DEVTOOLS_LIVERELOAD_ENABLED: "false"
+
+      # Options JVM optimisées
+      JAVA_OPTS: >-
+        -Xmx512m
+        -Xms256m
+        -XX:+UseG1GC
+        -XX:MaxGCPauseMillis=200
+        -XX:+HeapDumpOnOutOfMemoryError
+        -XX:HeapDumpPath=/app/logs
+        -Djava.security.egd=file:/dev/./urandom
+    ports:
+      - "8080:8080"
+    volumes:
+      - backend_logs:/app/logs
+    networks:
+      - auth-network
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+
+  # pgAdmin pour la gestion de la base de données (optionnel)
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: auth-pgadmin
+    restart: unless-stopped
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+      PGADMIN_CONFIG_SERVER_MODE: "False"
+    ports:
+      - "5050:80"
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    networks:
+      - auth-network
+    depends_on:
+      - postgres
+
+volumes:
+  postgres_data:
+    driver: local
+  pgadmin_data:
+    driver: local
+  backend_logs:
+    driver: local
+
+networks:
+  auth-network:
+    driver: bridge

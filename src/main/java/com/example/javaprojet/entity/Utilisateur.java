@@ -94,6 +94,30 @@ public class Utilisateur {
     @JsonManagedReference
     private List<Tache> taches;
 
+    // ✅ AJOUTE CETTE MÉTHODE ICI - Elle génère automatiquement l'identifiant
+    @PrePersist
+    public void onCreate() {
+        // Générer l'identifiant automatiquement si null ou vide
+        if (this.identifiant == null || this.identifiant.trim().isEmpty()) {
+            this.identifiant = this.email;
+        }
+
+        // Initialiser la date d'inscription si null
+        if (this.dateInscription == null) {
+            this.dateInscription = new Date();
+        }
+
+        // Initialiser le rôle si null
+        if (this.role == null) {
+            this.role = RoleType.USER;
+        }
+
+        // Initialiser le rôle secondaire si null
+        if (this.roleSecondaire == null) {
+            this.roleSecondaire = RoleSecondaire.GUESS;
+        }
+    }
+
     public void setConnecte(boolean connecte) {
         this.estConnecte = connecte;
         this.estEnLigne = connecte;

@@ -4,7 +4,6 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -19,52 +18,61 @@ import java.io.IOException;
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    @Autowired
-    private JwtService jwtService;
+    private final JwtService jwtService;
+    private final CustomUserDetailsService userDetailsService;
 
-    @Autowired
-    private CustomUserDetailsService customUserDetailsService;
+    public JwtAuthenticationFilter(JwtService jwtService,
+                                   CustomUserDetailsService userDetailsService) {
+        this.jwtService = jwtService;
+        this.userDetailsService = userDetailsService;
+    }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+    protected void doFilterInternal(HttpServletRequest request,
+                                    HttpServletResponse response,
+                                    FilterChain filterChain)
             throws ServletException, IOException {
 
-        String jwt = getJwtFromRequest(request);
+        // ✅ Ignore OPTIONS (CORS preflight)
+        if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
+            filterChain.doFilter(request, response);
+            return;
+        }
 
-        if (StringUtils.hasText(jwt)) {
+        String authHeader = request.getHeader("Authorization");
+
+        if (StringUtils.hasText(authHeader) && authHeader.startsWith("Bearer ")) {
+            String token = authHeader.substring(7).trim();
+
             try {
-                String username = jwtService.extractUsername(jwt);
+                String username = jwtService.extractUsername(token);
 
-                if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                    UserDetails userDetails = customUserDetailsService.loadUserByUsername(username);
+                if (username != null &&
+                        SecurityContextHolder.getContext().getAuthentication() == null) {
 
-                    if (jwtService.validateToken(jwt, userDetails)) {
-                        UsernamePasswordAuthenticationToken authentication =
-                                new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-                        authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                    UserDetails userDetails =
+                            userDetailsService.loadUserByUsername(username);
 
-                        SecurityContextHolder.getContext().setAuthentication(authentication);
+                    if (jwtService.validateToken(token, userDetails)) {
+                        UsernamePasswordAuthenticationToken authToken =
+                                new UsernamePasswordAuthenticationToken(
+                                        userDetails,
+                                        null,
+                                        userDetails.getAuthorities()
+                                );
+
+                        authToken.setDetails(
+                                new WebAuthenticationDetailsSource().buildDetails(request)
+                        );
+
+                        SecurityContextHolder.getContext().setAuthentication(authToken);
                     }
                 }
             } catch (JwtException e) {
-                logger.error("Token JWT invalide: " + e.getMessage());
-                // Ne pas définir l'authentification, laisser la requête continuer
-            } catch (Exception e) {
-                logger.error("Erreur lors du traitement du token JWT", e);
-                // Ne pas définir l'authentification, laisser la requête continuer
+                logger.warn("JWT invalide : " + e.getMessage());
             }
         }
 
         filterChain.doFilter(request, response);
-    }
-
-    private String getJwtFromRequest(HttpServletRequest request) {
-        String bearerToken = request.getHeader("Authorization");
-        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
-            // Nettoyer le token des espaces éventuels
-            String token = bearerToken.substring(7).trim();
-            return token.isEmpty() ? null : token;
-        }
-        return null;
     }
 }

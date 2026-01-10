@@ -1,13 +1,13 @@
 package com.example.javaprojet.dto;
 
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Getter
+@Setter
 public class AuthRequestDTO {
     private String email;
     private String password;

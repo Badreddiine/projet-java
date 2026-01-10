@@ -4,7 +4,6 @@ import com.example.javaprojet.security.JwtAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -14,8 +13,11 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.firewall.HttpFirewall;
-import org.springframework.security.web.firewall.StrictHttpFirewall;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.List;
 
 @Configuration
 @EnableWebSecurity
@@ -24,52 +26,78 @@ public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthFilter;
 
-    // Liste des endpoints publics pour Swagger
-    private static final String[] SWAGGER_WHITELIST = {
-            "/swagger-ui.html",
-            "/swagger-ui/**",
-            "/v3/api-docs/**",
-            "/swagger-resources/**",
-            "/swagger-resources",
-            "/webjars/**"
-    };
-
     public SecurityConfig(JwtAuthenticationFilter jwtAuthFilter) {
         this.jwtAuthFilter = jwtAuthFilter;
     }
+
+    private static final String[] PUBLIC_WHITELIST = {
+            "/api/auth/**",
+            "/api/public/**",
+            "/swagger-ui/**",
+            "/v3/api-docs/**",
+            "/swagger-resources/**",
+            "/webjars/**",
+            "/actuator/**",
+            "/error",
+            "/favicon.ico"
+    };
+
+    // ✅ Configuration CORS Centralisée (La seule et unique)
     @Bean
-    public HttpFirewall customHttpFirewall() {
-        StrictHttpFirewall firewall = new StrictHttpFirewall();
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration config = new CorsConfiguration();
 
-        // Available methods in StrictHttpFirewall:
-        firewall.setAllowUrlEncodedSlash(true);        // Permet %2F
-        firewall.setAllowUrlEncodedPercent(true);      // Permet %25
-        firewall.setAllowUrlEncodedPeriod(true);       // Permet %2E
-        firewall.setAllowBackSlash(true);              // Permet \
-        firewall.setAllowSemicolon(true);              // Permet ;
-        firewall.setAllowUrlEncodedCarriageReturn(true); // Permet %0D
-        firewall.setAllowUrlEncodedLineFeed(true);     // Permet %0A (newline)
+        // Si votre frontend tourne sur le port 3000
+        config.setAllowedOrigins(List.of("http://localhost:3000"));
 
-        // Pour autoriser les doubles slashes, utilisez:
-        firewall.setAllowUrlEncodedSlash(true);
+        // ASTUCE : Si jamais localhost:3000 ne marche pas, commentez la ligne du dessus
+        // et décommentez la ligne du dessous pour autoriser TOUT LE MONDE (mode dev) :
+        // config.setAllowedOriginPatterns(List.of("*"));
 
-        return firewall;
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
+        config.setAllowedHeaders(List.of("*"));
+        config.setExposedHeaders(List.of("Authorization"));
+        config.setAllowCredentials(true);
+        config.setMaxAge(3600L);
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", config);
+        return source;
     }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
-                .cors(Customizer.withDefaults())
+
+                // On applique la configuration CORS définie ci-dessus
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+
+                .sessionManagement(session ->
+                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                )
+
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**").permitAll()
-//                        .requestMatchers("/api/reunions/**").permitAll()
-                        // Autorise les endpoints Swagger sans authentification
-                        .requestMatchers(SWAGGER_WHITELIST).permitAll()
+                        .requestMatchers(PUBLIC_WHITELIST).permitAll()
+                        // Autorise les requêtes "OPTIONS" (Pre-flight) sans token
+                        .requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll()
                         .anyRequest().authenticated()
                 )
-                .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
+
+                .exceptionHandling(exception -> exception
+                        .authenticationEntryPoint((request, response, ex) -> {
+                            response.setStatus(401);
+                            response.setContentType("application/json");
+                            response.getWriter().write("{\"error\":\"Unauthorized\"}");
+                        })
+                        .accessDeniedHandler((request, response, ex) -> {
+                            response.setStatus(403);
+                            response.setContentType("application/json");
+                            response.getWriter().write("{\"error\":\"Access Denied\"}");
+                        })
+                );
 
         return http.build();
     }

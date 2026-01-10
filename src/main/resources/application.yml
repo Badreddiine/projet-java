@@ -1,0 +1,182 @@
+# Configuration de base
+spring:
+  application:
+    name: auth-jwt-oauth2
+
+  # Base de données PostgreSQL
+  datasource:
+    url: jdbc:postgresql://postgres:5432/db  # Utiliser 'postgres' au lieu de 'localhost' dans Docker
+    username: postgres
+    password: '1234'
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 20
+      minimum-idle: 5
+      idle-timeout: 300000
+      max-lifetime: 600000
+      connection-timeout: 30000
+      connection-test-query: SELECT 1
+
+  # JPA/Hibernate pour PostgreSQL
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: true
+        use_sql_comments: true
+        jdbc:
+          batch_size: 20
+        order_inserts: true
+        order_updates: true
+        generate_statistics: false
+        default_schema: public
+    open-in-view: false
+    show-sql: true
+
+  # OAuth2 Configuration (optionnel - peut être commenté si non utilisé)
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${GOOGLE_CLIENT_ID:your-google-client-id}
+            client-secret: ${GOOGLE_CLIENT_SECRET:your-google-client-secret}
+            scope: profile,email
+            redirect-uri: '{baseUrl}/login/oauth2/code/{registrationId}'
+          github:
+            client-id: ${GITHUB_CLIENT_ID:your-github-client-id}
+            client-secret: ${GITHUB_CLIENT_SECRET:your-github-client-secret}
+            scope: user:email,read:user
+            redirect-uri: '{baseUrl}/login/oauth2/code/{registrationId}'
+
+  # DevTools - DÉSACTIVÉ
+  devtools:
+    restart:
+      enabled: false
+    livereload:
+      enabled: false
+
+  # Configuration des uploads
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+      enabled: true
+
+  # Configuration Jackson
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+      fail-on-empty-beans: false
+    deserialization:
+      fail-on-unknown-properties: false
+    time-zone: UTC
+    date-format: "yyyy-MM-dd'T'HH:mm:ss.SSSXXX"
+
+# Configuration du serveur
+server:
+  port: 8080
+  servlet:
+    context-path: /
+    session:
+      timeout: 30m
+      cookie:
+        name: JSESSIONID
+        http-only: true
+        secure: false
+        same-site: lax
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
+  compression:
+    enabled: true
+    mime-types: text/html,text/xml,text/plain,text/css,text/javascript,application/javascript,application/json
+    min-response-size: 1024
+  http2:
+    enabled: false  # Désactiver HTTP/2 peut résoudre certains problèmes CORS
+  error:
+    include-message: always
+    include-binding-errors: always
+    include-stacktrace: on_param  # Changé pour debug
+    include-exception: true       # Activé pour debug
+    whitelabel:
+      enabled: true
+
+# JWT Configuration
+jwt:
+  secret: dGVzdC1zZWNyZXQtZm9yLWp3dC10b2tlbi1nZW5lcmF0aW9uLXdpdGgtaGFzaC0yNTYtYWxnb3JpdGhtLWFuZC1zZWN1cml0eQ==
+  expiration-ms: 86400000        # 24 heures
+  refresh-expiration-ms: 604800000  # 7 jours
+  header: Authorization
+  prefix: 'Bearer '  # Ajouter un espace après Bearer
+
+# Niveau de journalisation
+logging:
+  level:
+    root: INFO
+    com.example.javaprojet: DEBUG
+    org.springframework.security: DEBUG
+    org.springframework.web: DEBUG
+    org.springframework.web.cors: DEBUG  # Important pour debug CORS
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+  pattern:
+    console: '%d{yyyy-MM-dd HH:mm:ss} - %msg%n'
+
+# Actuator endpoints
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,env
+      base-path: /actuator
+      cors:
+        allowed-origins: '*'
+        allowed-methods: GET,POST
+  endpoint:
+    health:
+      show-details: always  # Changé pour voir les détails
+      show-components: always
+  health:
+    db:
+      enabled: true
+  info:
+    env:
+      enabled: true
+
+# Configuration spécifique à l'environnement
+---
+spring:
+  config:
+    activate:
+      on-profile: dev
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/db  # localhost pour dev local
+
+logging:
+  level:
+    root: DEBUG
+    com.example.javaprojet: TRACE
+
+---
+spring:
+  config:
+    activate:
+      on-profile: prod
+
+  datasource:
+    url: jdbc:postgresql://postgres:5432/db  # Service Docker
+
+logging:
+  level:
+    root: INFO
+    com.example.javaprojet: INFO
+
+server:
+  error:
+    include-stacktrace: never
+    include-exception: false

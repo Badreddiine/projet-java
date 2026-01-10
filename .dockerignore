@@ -1,0 +1,50 @@
+# Répertoires Maven
+target/
+!target/*.jar
+.mvn/
+
+# Fichiers IDE
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
+.project
+.classpath
+.settings/
+
+# Fichiers système
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Fichiers temporaires
+*.tmp
+*.temp
+*.swp
+*.swo
+
+# Docker
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# Documentation
+README.md
+docs/
+
+# Tests
+src/test/
+
+# Environnement
+.env
+.env.local
+.env.*.local
